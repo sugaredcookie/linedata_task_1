@@ -1,5 +1,3 @@
-# GitHub-Native Configuration Management Portal
-
 ## Overview
 
 The objective is to provide a simple and secure way to manage configuration data directly within GitHub without requiring any additional servers, databases, or web applications.
