@@ -1,106 +1,93 @@
 name: Configuration Pipeline
 
 on:
-issues:
-types:
-- opened
+  issues:
+    types:
+      - opened
 
 permissions:
-issues: write
+  issues: write
 
 jobs:
 
-dev:
-runs-on: ubuntu-latest
+  dev:
+    runs-on: ubuntu-latest
 
-```
-steps:
-  - uses: actions/checkout@v4
+    steps:
+    - uses: actions/checkout@v4
 
-  - name: DEV Validation
-    run: |
-      echo "Running DEV Validation"
+    ```
+    - name: DEV Validation
+      run: |
+        echo "===== ISSUE BODY START ====="
+        echo "${{ github.event.issue.body }}"
+        echo "===== ISSUE BODY END ====="
 
-      echo ""
-      echo "===== ISSUE BODY START ====="
-      echo "${{ github.event.issue.body }}"
-      echo "===== ISSUE BODY END ====="
-      echo ""
+        echo ""
+        echo "Checking JSON file..."
+        cat config/configurations.json
 
-      APP=$(echo "${{ github.event.issue.body }}" | grep "Application Name" -A1 | tail -n1 | xargs)
+        echo ""
+        echo "DEV Debug Complete"
+    ```
 
-      echo "Extracted Application: [$APP]"
 
-      if grep -q "\"name\": \"$APP\"" config/configurations.json; then
-        echo "✓ Application Found"
-      else
-        echo "✗ Application Not Found"
-        exit 1
-      fi
-```
+  qa:
+    needs: dev
+    runs-on: ubuntu-latest
 
-qa:
-needs: dev
-runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-```
-steps:
-  - uses: actions/checkout@v4
+      - name: QA Validation
+        run: |
+          echo "Running QA Validation"
 
-  - name: QA Validation
-    run: |
-      echo "Running QA Validation"
+          KEY=$(echo "${{ github.event.issue.body }}" | grep "Configuration Key" -A1 | tail -n1 | xargs)
 
-      KEY=$(echo "${{ github.event.issue.body }}" | grep "Configuration Key" -A1 | tail -n1 | xargs)
+          echo "Key: $KEY"
 
-      echo "Extracted Key: [$KEY]"
+          if grep -q "\"$KEY\"" config/configurations.json; then
+            echo "✓ Configuration Key Found"
+          else
+            echo "✗ Configuration Key Missing"
+            exit 1
+          fi
 
-      if grep -q "\"$KEY\"" config/configurations.json; then
-        echo "✓ Configuration Key Found"
-      else
-        echo "✗ Configuration Key Missing"
-        exit 1
-      fi
-```
+  uat:
+    needs: qa
+    runs-on: ubuntu-latest
 
-uat:
-needs: qa
-runs-on: ubuntu-latest
+    steps:
+      - name: UAT Validation
+        run: |
+          echo "Running UAT Validation"
 
-```
-steps:
-  - name: UAT Validation
-    run: |
-      echo "Running UAT Validation"
+          BODY="${{ github.event.issue.body }}"
 
-      BODY="${{ github.event.issue.body }}"
+          if echo "$BODY" | grep -q "Change Reason"; then
+            echo "✓ Change Reason Provided"
+          else
+            echo "✗ Change Reason Missing"
+            exit 1
+          fi
 
-      if [ -n "$BODY" ]; then
-        echo "✓ Issue Body Present"
-      else
-        echo "✗ Issue Body Empty"
-        exit 1
-      fi
-```
+  prod:
+    needs: uat
+    runs-on: ubuntu-latest
 
-prod:
-needs: uat
-runs-on: ubuntu-latest
+    steps:
+      - name: PROD Validation
+        run: |
+          echo "Running PROD Validation"
 
-```
-steps:
-  - name: PROD Validation
-    run: |
-      echo "Running PROD Validation"
+          echo "✓ DEV Passed"
+          echo "✓ QA Passed"
+          echo "✓ UAT Passed"
 
-      echo "✓ DEV Passed"
-      echo "✓ QA Passed"
-      echo "✓ UAT Passed"
+          echo ""
+          echo "DEPLOYMENT PIPELINE"
+          echo "DEV -> QA -> UAT -> PROD"
 
-      echo ""
-      echo "DEPLOYMENT PIPELINE"
-      echo "DEV -> QA -> UAT -> PROD"
-
-      echo ""
-      echo "✓ Ready For Deployment"
-```
+          echo ""
+          echo "✓ Ready For Deployment"
