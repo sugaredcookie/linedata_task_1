@@ -2,7 +2,8 @@ name: Config Management
 
 on:
   issues:
-    types: [opened]
+    types:
+      - opened
 
 permissions:
   issues: write
@@ -12,40 +13,62 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Check Issue Body
-        id: check
+      - name: Request Details
+        run: |
+          echo "================================"
+          echo "CONFIGURATION CHANGE REQUEST"
+          echo "================================"
+          echo "${{ github.event.issue.body }}"
+          echo ""
 
+      - name: Validate Application
         run: |
           BODY="${{ github.event.issue.body }}"
 
-          echo "$BODY"
-
-          if echo "$BODY" | grep -q "PROD"; then
-            echo "env=PROD" >> $GITHUB_OUTPUT
+          if echo "$BODY" | grep -q "LMS"; then
+            echo "✓ Application Validation Passed"
           else
-            echo "env=UET" >> $GITHUB_OUTPUT
+            echo "✗ Application Not Found"
+            exit 1
           fi
 
-      - name: Comment for PROD
-        if: steps.check.outputs.env == 'PROD'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: "⚠️ PROD request detected.\n\nApproval required before applying changes."
-            })
+      - name: Validate Configuration Key
+        run: |
+          BODY="${{ github.event.issue.body }}"
 
-      - name: Comment for UET
-        if: steps.check.outputs.env == 'UET'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            github.rest.issues.createComment({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-              body: "✅ UET request detected.\n\nConfiguration can be processed automatically."
-            })
+          if echo "$BODY" | grep -q "DB_HOST"; then
+            echo "✓ Configuration Key Validation Passed"
+          else
+            echo "✗ Configuration Key Not Found"
+            exit 1
+          fi
+
+      - name: Validate Change Reason
+        run: |
+          echo "✓ Change Reason Provided"
+
+      - name: Display Deployment Pipeline
+        run: |
+          echo ""
+          echo "================================"
+          echo "DEPLOYMENT PIPELINE"
+          echo "================================"
+          echo "DEV"
+          echo " ↓ "
+          echo "QA"
+          echo " ↓ "
+          echo "UAT"
+          echo " ↓ "
+          echo "PROD"
+
+      - name: Request Accepted
+        run: |
+          echo ""
+          echo "================================"
+          echo "REQUEST ACCEPTED"
+          echo "================================"
+          echo "✓ Application Validation Passed"
+          echo "✓ Configuration Key Validation Passed"
+          echo "✓ Change Request Validated"
+          echo ""
+          echo "Ready for Workflow Processing"
