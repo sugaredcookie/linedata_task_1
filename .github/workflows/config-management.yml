@@ -1,4 +1,4 @@
-name: Config Management
+name: Configuration Pipeline
 
 on:
   issues:
@@ -9,66 +9,84 @@ permissions:
   issues: write
 
 jobs:
-  process:
+
+  dev:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Request Details
-        run: |
-          echo "================================"
-          echo "CONFIGURATION CHANGE REQUEST"
-          echo "================================"
-          echo "${{ github.event.issue.body }}"
-          echo ""
+      - uses: actions/checkout@v4
 
-      - name: Validate Application
+      - name: DEV Validation
         run: |
-          BODY="${{ github.event.issue.body }}"
+          echo "Running DEV Validation"
 
-          if echo "$BODY" | grep -q "LMS"; then
-            echo "✓ Application Validation Passed"
+          APP=$(echo "${{ github.event.issue.body }}" | grep "Application Name" -A1 | tail -n1 | xargs)
+
+          echo "Application: $APP"
+
+          if grep -q "\"name\": \"$APP\"" config/configurations.json; then
+            echo "✓ Application Found"
           else
             echo "✗ Application Not Found"
             exit 1
           fi
 
-      - name: Validate Configuration Key
-        run: |
-          BODY="${{ github.event.issue.body }}"
+  qa:
+    needs: dev
+    runs-on: ubuntu-latest
 
-          if echo "$BODY" | grep -q "DB_HOST"; then
-            echo "✓ Configuration Key Validation Passed"
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: QA Validation
+        run: |
+          echo "Running QA Validation"
+
+          KEY=$(echo "${{ github.event.issue.body }}" | grep "Configuration Key" -A1 | tail -n1 | xargs)
+
+          echo "Key: $KEY"
+
+          if grep -q "\"$KEY\"" config/configurations.json; then
+            echo "✓ Configuration Key Found"
           else
-            echo "✗ Configuration Key Not Found"
+            echo "✗ Configuration Key Missing"
             exit 1
           fi
 
-      - name: Validate Change Reason
-        run: |
-          echo "✓ Change Reason Provided"
+  uat:
+    needs: qa
+    runs-on: ubuntu-latest
 
-      - name: Display Deployment Pipeline
+    steps:
+      - name: UAT Validation
         run: |
+          echo "Running UAT Validation"
+
+          BODY="${{ github.event.issue.body }}"
+
+          if echo "$BODY" | grep -q "Change Reason"; then
+            echo "✓ Change Reason Provided"
+          else
+            echo "✗ Change Reason Missing"
+            exit 1
+          fi
+
+  prod:
+    needs: uat
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: PROD Validation
+        run: |
+          echo "Running PROD Validation"
+
+          echo "✓ DEV Passed"
+          echo "✓ QA Passed"
+          echo "✓ UAT Passed"
+
           echo ""
-          echo "================================"
           echo "DEPLOYMENT PIPELINE"
-          echo "================================"
-          echo "DEV"
-          echo " ↓ "
-          echo "QA"
-          echo " ↓ "
-          echo "UAT"
-          echo " ↓ "
-          echo "PROD"
+          echo "DEV -> QA -> UAT -> PROD"
 
-      - name: Request Accepted
-        run: |
           echo ""
-          echo "================================"
-          echo "REQUEST ACCEPTED"
-          echo "================================"
-          echo "✓ Application Validation Passed"
-          echo "✓ Configuration Key Validation Passed"
-          echo "✓ Change Request Validated"
-          echo ""
-          echo "Ready for Workflow Processing"
+          echo "✓ Ready For Deployment"
