@@ -1,0 +1,38 @@
+name: Delete Configuration
+description: Request the removal of an existing configuration key
+title: "[DELETE] "
+
+body:
+  - type: input
+    id: application
+    attributes:
+      label: Application Name
+      placeholder: LMS
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - UET
+        - PROD
+    validations:
+      required: true
+
+  - type: input
+    id: key
+    attributes:
+      label: Configuration Key
+      placeholder: OLD_LEGACY_URL
+    validations:
+      required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Reason for Deletion
+      placeholder: This feature has been fully deprecated and removed from the codebase.
+    validations:
+      required: false
