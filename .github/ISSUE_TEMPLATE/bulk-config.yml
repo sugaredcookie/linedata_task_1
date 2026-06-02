@@ -1,34 +1,42 @@
 name: Bulk Configuration Change
-description: Add, update, or remove multiple configurations simultaneously
-title: "[BULK-CONFIG] "
+description: Submit multiple configuration changes in one request
+title: "[BULK CONFIG CHANGE] "
 
 body:
   - type: input
     id: application
     attributes:
       label: Application Name
+      description: Enter the target application
       placeholder: LMS
-    validations:
-      required: true
-
-  - type: dropdown
-    id: environment
-    attributes:
-      label: Environment
-      options:
-        - UET
-        - PROD
     validations:
       required: true
 
   - type: textarea
     id: config_changes
     attributes:
-      label: Configuration Changes (KEY=VALUE)
-      description: Provide the list of changes, one per line. For deletions, use KEY=DELETE.
+      label: Configuration Changes
+      description: One change per line
       placeholder: |
         NEW_TIMEOUT=30
-        OLD_API_KEY=DELETE
         MAX_RETRIES=5
+        OLD_API_KEY=DELETE
     validations:
       required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Change Reason
+      description: Explain why these changes are required
+      placeholder: AWS migration configuration updates
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have reviewed the request before submission.
+          required: true

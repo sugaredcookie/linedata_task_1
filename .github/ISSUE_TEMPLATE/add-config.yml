@@ -1,23 +1,14 @@
 name: Add Configuration
 description: Request a new configuration key and value to be added
-title: "[ADD] "
+title: "[ADD CONFIG] "
 
 body:
   - type: input
     id: application
     attributes:
       label: Application Name
+      description: Enter the target application
       placeholder: LMS
-    validations:
-      required: true
-
-  - type: dropdown
-    id: environment
-    attributes:
-      label: Environment
-      options:
-        - UET
-        - PROD
     validations:
       required: true
 
@@ -25,6 +16,7 @@ body:
     id: key
     attributes:
       label: Configuration Key
+      description: Enter the new configuration key
       placeholder: NEW_FEATURE_ENABLED
     validations:
       required: true
@@ -33,6 +25,24 @@ body:
     id: value
     attributes:
       label: Configuration Value
-      placeholder: "true"
+      description: Enter the value for the new configuration
+      placeholder: true
     validations:
       required: true
+
+  - type: textarea
+    id: reason
+    attributes:
+      label: Change Reason
+      description: Explain why this configuration is required
+      placeholder: Enable new feature rollout
+    validations:
+      required: true
+
+  - type: checkboxes
+    id: confirmation
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have reviewed the request before submission.
+          required: true
