@@ -1,1 +1,51 @@
+name: Config Management
 
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  issues: write
+
+jobs:
+  process:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check Issue Body
+        id: check
+
+        run: |
+          BODY="${{ github.event.issue.body }}"
+
+          echo "$BODY"
+
+          if echo "$BODY" | grep -q "PROD"; then
+            echo "env=PROD" >> $GITHUB_OUTPUT
+          else
+            echo "env=UET" >> $GITHUB_OUTPUT
+          fi
+
+      - name: Comment for PROD
+        if: steps.check.outputs.env == 'PROD'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "⚠️ PROD request detected.\n\nApproval required before applying changes."
+            })
+
+      - name: Comment for UET
+        if: steps.check.outputs.env == 'UET'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "✅ UET request detected.\n\nConfiguration can be processed automatically."
+            })
