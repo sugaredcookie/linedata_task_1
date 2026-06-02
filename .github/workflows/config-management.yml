@@ -16,7 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    ```
     - name: DEV Validation
       run: |
         echo "===== ISSUE BODY START ====="
@@ -29,7 +28,6 @@ jobs:
 
         echo ""
         echo "DEV Debug Complete"
-    ```
 
 
   qa:
