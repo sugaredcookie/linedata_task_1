@@ -1,6 +1,6 @@
 {
   "LMS": {
-    "DB_HOST": "old-db.company.com",
+    "DB_HOST": "aws-prod.company.com",
     "DB_PORT": "5432"
   },
   "ChurchManagement": {
