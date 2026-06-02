@@ -1,19 +1,9 @@
 {
-  "applications": [
-    {
-      "name": "LMS",
-      "keys": [
-        "DB_HOST",
-        "DB_PORT",
-        "AWS_REGION"
-      ]
-    },
-    {
-      "name": "ChurchManagement",
-      "keys": [
-        "API_URL",
-        "EMAIL_PROVIDER"
-      ]
-    }
-  ]
+  "LMS": {
+    "DB_HOST": "old-db.company.com",
+    "DB_PORT": "5432"
+  },
+  "ChurchManagement": {
+    "API_URL": "https://api.company.com"
+  }
 }
