@@ -1,0 +1,38 @@
+name: Add Configuration
+description: Request a new configuration key and value to be added
+title: "[ADD] "
+
+body:
+  - type: input
+    id: application
+    attributes:
+      label: Application Name
+      placeholder: LMS
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - UET
+        - PROD
+    validations:
+      required: true
+
+  - type: input
+    id: key
+    attributes:
+      label: Configuration Key
+      placeholder: NEW_FEATURE_ENABLED
+    validations:
+      required: true
+
+  - type: input
+    id: value
+    attributes:
+      label: Configuration Value
+      placeholder: "true"
+    validations:
+      required: true
