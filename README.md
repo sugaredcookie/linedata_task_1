@@ -1,3 +1,5 @@
+# GitHub-Native Configuration Management Portal
+
 ## Overview
 
 The objective is to provide a simple and secure way to manage configuration data directly within GitHub without requiring any additional servers, databases, or web applications.
@@ -33,9 +35,100 @@ Access Control
 
 ---
 
+## Repository Structure
+
+The repository will contain Issue Form definitions inside the `.github` directory.
+
+Example:
+
+```text
+.github/
+├── ISSUE_TEMPLATE/
+│   ├── add-config.yml
+│   ├── update-config.yml
+│   ├── delete-config.yml
+│   └── search-config.yml
+│
+└── workflows/
+    └── config-management.yml
+```
+
+### Purpose
+
+**ISSUE_TEMPLATE**
+
+* Contains all GitHub Issue Forms.
+* Defines the user interface fields.
+* Provides separate forms for different operations.
+
+**workflows**
+
+* Contains GitHub Actions.
+* Processes requests submitted through Issue Forms.
+* Updates configuration files automatically.
+
+---
+
+## Setup Process
+
+### Step 1: Create Issue Forms
+
+Create the following directory:
+
+```text
+.github/ISSUE_TEMPLATE/
+```
+
+Inside this folder, create YAML files such as:
+
+```text
+add-config.yml
+update-config.yml
+delete-config.yml
+search-config.yml
+```
+
+These YAML files define the form fields displayed to users when creating a new issue.
+
+Example fields:
+
+* Application Name
+* Environment
+* Configuration Key
+* Configuration Value
+* Change Reason
+
+---
+
+### Step 2: Create GitHub Action
+
+Create the following directory:
+
+```text
+.github/workflows/
+```
+
+Inside this folder, create:
+
+```text
+config-management.yml
+```
+
+This workflow will:
+
+1. Trigger when an issue is created.
+2. Read submitted form data.
+3. Validate the request.
+4. Locate the required configuration file.
+5. Apply the requested change.
+6. Create commits or pull requests.
+7. Update the issue status.
+
+---
+
 ## User Workflow
 
-### Step 1: Create a Request
+### Create a Request
 
 A user selects the required action from GitHub Issues.
 
@@ -62,7 +155,7 @@ Reason for Change: Database migration
 
 ---
 
-### Step 2: Automated Processing
+### Automated Processing
 
 Once the form is submitted:
 
@@ -76,7 +169,7 @@ Once the form is submitted:
 
 ---
 
-### Step 3: Review and Tracking
+## Review and Tracking
 
 All changes remain inside GitHub and can be tracked through:
 
