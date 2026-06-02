@@ -1,0 +1,34 @@
+name: Bulk Configuration Change
+description: Add, update, or remove multiple configurations simultaneously
+title: "[BULK-CONFIG] "
+
+body:
+  - type: input
+    id: application
+    attributes:
+      label: Application Name
+      placeholder: LMS
+    validations:
+      required: true
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - UET
+        - PROD
+    validations:
+      required: true
+
+  - type: textarea
+    id: config_changes
+    attributes:
+      label: Configuration Changes (KEY=VALUE)
+      description: Provide the list of changes, one per line. For deletions, use KEY=DELETE.
+      placeholder: |
+        NEW_TIMEOUT=30
+        OLD_API_KEY=DELETE
+        MAX_RETRIES=5
+    validations:
+      required: true
