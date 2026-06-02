@@ -1,1 +1,30 @@
+name: Update Configuration
+description: Update a configuration value
+title: "[UPDATE] "
 
+body:
+  - type: input
+    id: application
+    attributes:
+      label: Application Name
+      placeholder: LMS
+
+  - type: dropdown
+    id: environment
+    attributes:
+      label: Environment
+      options:
+        - DEV
+        - PROD
+
+  - type: input
+    id: key
+    attributes:
+      label: Configuration Key
+      placeholder: DB_HOST
+
+  - type: input
+    id: value
+    attributes:
+      label: New Value
+      placeholder: new-db.company.com
