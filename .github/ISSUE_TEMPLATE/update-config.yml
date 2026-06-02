@@ -14,7 +14,7 @@ body:
     attributes:
       label: Environment
       options:
-        - DEV
+        - UET
         - PROD
 
   - type: input
