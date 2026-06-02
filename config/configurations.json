@@ -1,1 +1,32 @@
-
+{
+  "applications": [
+    {
+      "name": "LMS",
+      "environments": {
+        "DEV": {
+          "DB_HOST": "dev-db.company.com",
+          "DB_PORT": "5432",
+          "AWS_REGION": "ap-south-1"
+        },
+        "PROD": {
+          "DB_HOST": "prod-db.company.com",
+          "DB_PORT": "5432",
+          "AWS_REGION": "ap-south-1"
+        }
+      }
+    },
+    {
+      "name": "ChurchManagement",
+      "environments": {
+        "DEV": {
+          "API_URL": "https://dev-api.company.com",
+          "EMAIL_PROVIDER": "smtp"
+        },
+        "PROD": {
+          "API_URL": "https://api.company.com",
+          "EMAIL_PROVIDER": "ses"
+        }
+      }
+    }
+  ]
+}
