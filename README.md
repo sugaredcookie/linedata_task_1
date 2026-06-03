@@ -1,221 +1,44 @@
+# GitHub-Based Configuration Management Portal
+
 ## Overview
 
-The objective is to provide a simple and secure way to manage configuration data directly within GitHub without requiring any additional servers, databases, or web applications.
+The objective of this project is to provide a secure and controlled mechanism for managing application configuration changes directly through GitHub.
 
-Instead of manually locating configuration files, searching through them, and making edits, users will interact with a GitHub-based portal using Issue Forms.
+Instead of manually locating configuration files, updating values, and maintaining change records, users submit configuration change requests through GitHub Issue Forms. These requests are automatically validated, processed, audited, and deployed through a GitHub Actions pipeline.
 
----
-
-## Proposed Solution
-
-Use GitHub Issue Forms as the user interface and GitHub Actions as the processing engine.
-
-This allows all configuration management operations to be performed directly within GitHub while maintaining version control, security, and auditability.
+The solution leverages GitHub as both the user interface and orchestration platform, eliminating the need for additional web applications or management portals.
 
 ---
 
 ## Architecture
 
-Frontend (UI)
-→ GitHub Issue Forms
+### Frontend
 
-Backend
-→ GitHub Actions
+GitHub Issue Forms
 
-Storage
-→ Configuration files stored in the repository
+### Processing Layer
 
-Version Control
-→ Git commits and pull requests
+GitHub Actions
 
-Access Control
-→ GitHub repository permissions
+### Validation Layer
 
----
+DEV → QA → UAT Validation Gates
 
-## Repository Structure
+### Configuration Engine
 
-The repository will contain Issue Form definitions inside the `.github` directory.
+Node.js Configuration Processing Engine
 
-Example:
+### Configuration Store
 
-```text
-.github/
-├── ISSUE_TEMPLATE/
-│   ├── add-config.yml
-│   ├── update-config.yml
-│   ├── delete-config.yml
-│   └── search-config.yml
-│
-└── workflows/
-    └── config-management.yml
-```
+SQLite Database
 
-### Purpose
+### Audit Store
 
-**ISSUE_TEMPLATE**
+Change History Audit Log
 
-* Contains all GitHub Issue Forms.
-* Defines the user interface fields.
-* Provides separate forms for different operations.
+### Version Control
 
-**workflows**
-
-* Contains GitHub Actions.
-* Processes requests submitted through Issue Forms.
-* Updates configuration files automatically.
-
----
-
-## Setup Process
-
-### Step 1: Create Issue Forms
-
-Create the following directory:
-
-```text
-.github/ISSUE_TEMPLATE/
-```
-
-Inside this folder, create YAML files such as:
-
-```text
-add-config.yml
-update-config.yml
-delete-config.yml
-search-config.yml
-```
-
-These YAML files define the form fields displayed to users when creating a new issue.
-
-Example fields:
-
-* Application Name
-* Environment
-* Configuration Key
-* Configuration Value
-* Change Reason
-
----
-
-### Step 2: Create GitHub Action
-
-Create the following directory:
-
-```text
-.github/workflows/
-```
-
-Inside this folder, create:
-
-```text
-config-management.yml
-```
-
-This workflow will:
-
-1. Trigger when an issue is created.
-2. Read submitted form data.
-3. Validate the request.
-4. Locate the required configuration file.
-5. Apply the requested change.
-6. Create commits or pull requests.
-7. Update the issue status.
-
----
-
-## User Workflow
-
-### Create a Request
-
-A user selects the required action from GitHub Issues.
-
-Examples:
-
-* Add Configuration
-* Update Configuration
-* Delete Configuration
-* Search Configuration
-
-Each option opens a structured form created using GitHub Issue Forms.
-
-Example:
-
-Application Name: LMS
-
-Environment: PROD
-
-Configuration Key: DB_HOST
-
-New Value: xyz.company.com
-
-Reason for Change: Database migration
-
----
-
-### Automated Processing
-
-Once the form is submitted:
-
-1. A GitHub Action is triggered.
-2. The request details are validated.
-3. The required configuration file is identified.
-4. The requested operation is performed.
-5. Changes are committed automatically.
-6. A Pull Request can be created if approval is required.
-7. The issue is updated with the execution status.
-
----
-
-## Review and Tracking
-
-All changes remain inside GitHub and can be tracked through:
-
-* Issues
-* Pull Requests
-* Commit History
-* GitHub Projects (optional)
-
-This provides a complete audit trail for every modification.
-
----
-
-## Security
-
-The repository remains private.
-
-Only users with repository access can:
-
-* Create requests
-* View requests
-* Modify configurations
-* Approve changes
-
-No separate authentication or authorization system is required because GitHub permissions are used directly.
-
----
-
-## Benefits
-
-* No external infrastructure
-* No separate web application
-* No additional servers
-* Uses existing GitHub authentication
-* Full version history
-* Complete audit trail
-* Easy rollback through Git
-* Direct integration with existing GitHub Actions workflows
-
----
-
-## Future Enhancements
-
-* Bulk configuration updates
-* Environment-specific approvals
-* Advanced search capabilities
-* Automated validation rules
-* Dashboard view using GitHub Projects
-* Integration with AWS deployment workflows
+Git Commits and GitHub Repository History
 
 ---
 
@@ -229,16 +52,310 @@ GitHub Issue Form
 
 ↓
 
-GitHub Action
+DEV Validation
 
 ↓
 
-Configuration File Update
+QA Validation
 
 ↓
 
-Commit / Pull Request
+UAT Validation
 
 ↓
 
-Repository History & Audit Trail
+Configuration Processing Engine
+
+↓
+
+SQL Configuration Store Update
+
+↓
+
+Audit Record Generation
+
+↓
+
+Git Commit
+
+↓
+
+Repository History
+
+---
+
+## Repository Structure
+
+```text
+.github/
+├── ISSUE_TEMPLATE/
+│   └── update-config.yml
+│
+└── workflows/
+    └── config-management.yml
+
+engine/
+├── process-request.js
+├── request-parser.js
+├── sql-handler.js
+├── json-handler.js
+├── csv-handler.js
+└── yaml-handler.js
+
+scripts/
+├── dev-validation.js
+├── qa-validation.js
+└── uat-validation.js
+
+database/
+└── demo.db
+
+audit/
+└── change-history.json
+```
+
+---
+
+## Solution Components
+
+### GitHub Issue Form
+
+Users submit configuration change requests using a structured form.
+
+Example:
+
+```text
+Application Name: RECON
+
+Section Name: shared_tokens
+
+Configuration Key: PortalEnvironment
+
+New Value: DR
+
+Change Reason: Disaster Recovery Testing
+```
+
+The Issue Form acts as the user interface for configuration management.
+
+---
+
+### Request Parser
+
+The request parser extracts values submitted through the GitHub Issue Form and converts them into a structured request object.
+
+Example:
+
+```json
+{
+  "application": "RECON",
+  "section": "shared_tokens",
+  "key": "PortalEnvironment",
+  "newValue": "DR",
+  "reason": "Disaster Recovery Testing"
+}
+```
+
+This request object is used throughout the pipeline.
+
+---
+
+## Validation Pipeline
+
+### DEV Validation
+
+Purpose:
+
+Validate that the requested configuration exists before any change is performed.
+
+Checks:
+
+* Application exists
+* Section exists
+* Configuration key exists
+
+Failure Example:
+
+```text
+Configuration Not Found
+```
+
+---
+
+### QA Validation
+
+Purpose:
+
+Validate that the submitted value is allowed.
+
+Allowed Values:
+
+```text
+DEV
+QA
+UAT
+DR
+PROD
+```
+
+Failure Example:
+
+```text
+Invalid Value
+```
+
+---
+
+### UAT Validation
+
+Purpose:
+
+Validate business justification for the requested change.
+
+Checks:
+
+* Change reason provided
+* Reason meets minimum requirements
+
+Failure Example:
+
+```text
+Business Reason Too Short
+```
+
+---
+
+## Configuration Processing Engine
+
+Once all validation stages pass, the Configuration Processing Engine executes the requested update.
+
+Current Supported Source:
+
+```text
+SQL
+```
+
+Future Supported Sources:
+
+```text
+JSON
+CSV
+YAML
+XML
+```
+
+The engine routes requests to the appropriate handler based on source type.
+
+---
+
+## SQL Configuration Store
+
+Configuration data is stored within a SQLite database.
+
+Example Structure:
+
+```text
+Application: RECON
+Section: shared_tokens
+Key: PortalEnvironment
+Value: PROD
+```
+
+Example Update:
+
+```text
+PortalEnvironment
+
+PROD
+↓
+
+DR
+```
+
+---
+
+## Audit Trail
+
+Every successful configuration change generates an audit record.
+
+Audit Information:
+
+* Timestamp
+* Application
+* Section
+* Configuration Key
+* Previous Value
+* New Value
+* Status
+
+Example:
+
+```json
+{
+  "timestamp": "2026-06-03T12:30:00Z",
+  "application": "RECON",
+  "section": "shared_tokens",
+  "key": "PortalEnvironment",
+  "oldValue": "PROD",
+  "newValue": "DR",
+  "status": "SUCCESS"
+}
+```
+
+---
+
+## Security
+
+The repository remains private.
+
+Access is controlled using native GitHub permissions.
+
+Authorized users can:
+
+* Create change requests
+* View request status
+* Review deployment history
+* Audit configuration changes
+
+No additional authentication system is required.
+
+---
+
+## Benefits
+
+* No external infrastructure
+* No dedicated web application
+* No separate backend server
+* Native GitHub authentication
+* Automated validation pipeline
+* Full auditability
+* Version-controlled changes
+* Easy rollback through Git history
+* Extensible architecture for multiple configuration sources
+
+---
+
+## Current Workflow Example
+
+1. User submits a configuration change request.
+2. GitHub Action is triggered automatically.
+3. DEV validation verifies configuration exists.
+4. QA validation verifies submitted value.
+5. UAT validation verifies business justification.
+6. Configuration Processing Engine updates the SQL configuration store.
+7. Audit record is generated.
+8. Changes are committed back to the repository.
+9. Complete history is available through Git and GitHub Actions.
+
+---
+
+## Future Enhancements
+
+* SQL-based audit history table
+* Rollback functionality
+* Pull Request approval workflow
+* Environment-specific approval gates
+* Multi-source configuration support
+* Bulk configuration updates
+* Integration with deployment pipelines
+* Dashboard reporting using GitHub Projects
