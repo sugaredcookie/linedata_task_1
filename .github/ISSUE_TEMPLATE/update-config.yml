@@ -7,8 +7,15 @@ body:
     id: application
     attributes:
       label: Application Name
-      description: Enter the target application
-      placeholder: LMS
+      placeholder: RECON
+    validations:
+      required: true
+
+  - type: input
+    id: section
+    attributes:
+      label: Section Name
+      placeholder: shared_tokens
     validations:
       required: true
 
@@ -16,8 +23,7 @@ body:
     id: key
     attributes:
       label: Configuration Key
-      description: Enter the configuration key to be updated
-      placeholder: DB_HOST
+      placeholder: PortalEnvironment
     validations:
       required: true
 
@@ -25,8 +31,7 @@ body:
     id: value
     attributes:
       label: New Value
-      description: Enter the new configuration value
-      placeholder: aws-prod-db.company.com
+      placeholder: PROD
     validations:
       required: true
 
@@ -34,15 +39,6 @@ body:
     id: reason
     attributes:
       label: Change Reason
-      description: Explain why this change is required
-      placeholder: Database migration to AWS
+      placeholder: Production deployment
     validations:
       required: true
-
-  - type: checkboxes
-    id: confirmation
-    attributes:
-      label: Confirmation
-      options:
-        - label: I have reviewed the change request before submission.
-          required: true
