@@ -92,6 +92,8 @@ jobs:
           echo "✓ Ready For Deployment"
 
       - name: Run Configuration Processing Engine
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
           node engine/process-request.js
 

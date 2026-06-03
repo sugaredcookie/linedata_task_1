@@ -1,23 +1,37 @@
-const sourceType = "SQL";
+const body = process.env.ISSUE_BODY;
 
-switch(sourceType) {
+function extract(label) {
 
-    case "JSON":
-        require("./json-handler");
-        break;
+  const lines = body.split("\n");
 
-    case "CSV":
-        require("./csv-handler");
-        break;
+  for (let i = 0; i < lines.length; i++) {
 
-    case "SQL":
-        require("./sql-handler");
-        break;
+    if (lines[i].includes(label)) {
+      return lines[i + 2]?.trim();
+    }
 
-    case "YAML":
-        require("./yaml-handler");
-        break;
+  }
 
-    default:
-        throw new Error("Unsupported source type");
+  return null;
 }
+
+const change = {
+
+  application:
+    extract("Application Name"),
+
+  section:
+    extract("Section Name"),
+
+  key:
+    extract("Configuration Key"),
+
+  newValue:
+    extract("New Value")
+
+};
+
+console.log("Incoming Request");
+console.log(change);
+
+require("./sql-handler")(change);

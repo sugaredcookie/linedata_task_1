@@ -3,6 +3,7 @@ description: Submit a configuration change request
 title: "[CONFIG CHANGE] "
 
 body:
+
   - type: input
     id: application
     attributes:
@@ -31,7 +32,7 @@ body:
     id: value
     attributes:
       label: New Value
-      placeholder: PROD
+      placeholder: DR
     validations:
       required: true
 
@@ -39,6 +40,6 @@ body:
     id: reason
     attributes:
       label: Change Reason
-      placeholder: Production deployment
+      placeholder: Disaster Recovery Testing
     validations:
       required: true
