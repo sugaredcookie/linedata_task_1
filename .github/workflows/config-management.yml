@@ -15,51 +15,60 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
 
-    - name: DEV Validation
-      run: |
-        echo "===== ISSUE BODY START ====="
-        echo "${{ github.event.issue.body }}"
-        echo "===== ISSUE BODY END ====="
+      - uses: actions/checkout@v4
 
-        echo ""
-        echo "Checking JSON file..."
-        cat config/configurations.json
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-        echo ""
-        echo "DEV Debug Complete"
+      - run: npm install
 
+      - name: DEV Validation
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/dev-validation.js
 
   qa:
     needs: dev
     runs-on: ubuntu-latest
 
     steps:
+
       - uses: actions/checkout@v4
 
-      - name: QA Validation
-        run: |
-          echo "Running QA Validation"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-          if grep -q '"DB_HOST"' config/configurations.json; then
-            echo "✓ Configuration Key Found"
-          else
-            echo "✗ Configuration Key Missing"
-            exit 1
-          fi
+      - run: npm install
+
+      - name: QA Validation
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/qa-validation.js
 
   uat:
     needs: qa
     runs-on: ubuntu-latest
 
     steps:
-      - name: UAT Validation
-        run: |
-          echo "Running UAT Validation"
 
-          echo "✓ Business Validation Passed"
-          echo "✓ Change Review Completed"
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: UAT Validation
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/uat-validation.js
 
   prod:
     needs: uat
