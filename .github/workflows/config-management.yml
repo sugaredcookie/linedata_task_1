@@ -83,9 +83,9 @@ jobs:
         echo ""
         echo "✓ Ready For Deployment"
 
-    - name: Update Configuration
+    - name: Run Configuration Processing Engine
       run: |
-        node scripts/update-config.js
+        node engine/process-request.js
 
     - name: Commit Changes
       run: |

@@ -1,0 +1,25 @@
+name: Database Change Request
+description: Request a database modification
+title: "[DB CHANGE] "
+
+body:
+  - type: input
+    id: table
+    attributes:
+      label: Table Name
+    validations:
+      required: true
+
+  - type: input
+    id: column
+    attributes:
+      label: Column Name
+    validations:
+      required: true
+
+  - type: input
+    id: value
+    attributes:
+      label: New Value
+    validations:
+      required: true
