@@ -66,34 +66,42 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-    - name: PROD Validation
-      run: |
-        echo "Running PROD Validation"
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
 
-        echo "✓ DEV Passed"
-        echo "✓ QA Passed"
-        echo "✓ UAT Passed"
+      - name: Install Dependencies
+        run: npm install
 
-        echo ""
-        echo "DEPLOYMENT PIPELINE"
-        echo "DEV -> QA -> UAT -> PROD"
+      - name: PROD Validation
+        run: |
+          echo "Running PROD Validation"
 
-        echo ""
-        echo "✓ Ready For Deployment"
+          echo "✓ DEV Passed"
+          echo "✓ QA Passed"
+          echo "✓ UAT Passed"
 
-    - name: Run Configuration Processing Engine
-      run: |
-        node engine/process-request.js
+          echo ""
+          echo "DEPLOYMENT PIPELINE"
+          echo "DEV -> QA -> UAT -> PROD"
 
-    - name: Commit Changes
-      run: |
-        git config --global user.name "github-actions"
-        git config --global user.email "github-actions@github.com"
+          echo ""
+          echo "✓ Ready For Deployment"
 
-        git add .
+      - name: Run Configuration Processing Engine
+        run: |
+          node engine/process-request.js
 
-        git commit -m "Update configuration"
+      - name: Commit Changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
 
-        git push
+          git add .
+
+          git commit -m "Update configuration" || echo "No changes"
+
+          git push
