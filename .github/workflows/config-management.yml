@@ -1,9 +1,7 @@
 name: Configuration Pipeline
 
 on:
-  issues:
-    types:
-      - opened
+  workflow_dispatch:
 
 permissions:
   issues: write
