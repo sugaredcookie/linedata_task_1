@@ -82,7 +82,7 @@ jobs:
         echo "✓ Ready For Deployment"
 
     - name: Run Configuration Processing Engine
-    - run: |
+      run: |
         node engine/process-request.js
 
     - name: Commit Changes
