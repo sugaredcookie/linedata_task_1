@@ -1,4 +1,4 @@
-const sourceType = process.env.SOURCE_TYPE;
+const sourceType = "SQL";
 
 switch(sourceType) {
 
