@@ -1,1 +1,12 @@
-[]
+[
+  {
+    "timestamp": "2026-06-03T10:45:18.914Z",
+    "issueNumber": 1,
+    "sourceType": "SQL",
+    "operation": "UPDATE",
+    "target": "customers.email",
+    "oldValue": "john@test.com",
+    "newValue": "updated@test.com",
+    "status": "SUCCESS"
+  }
+]
