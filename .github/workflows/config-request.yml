@@ -88,26 +88,6 @@ jobs:
         run: |
           node scripts/create-request-file.js
 
-        env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
-        run: |
-
-          mkdir -p requests
-
-          APPLICATION=$(echo "$ISSUE_BODY" | grep -A1 "Application Name" | tail -n1 | xargs)
-          SECTION=$(echo "$ISSUE_BODY" | grep -A1 "Section Name" | tail -n1 | xargs)
-          KEY=$(echo "$ISSUE_BODY" | grep -A1 "Configuration Key" | tail -n1 | xargs)
-          VALUE=$(echo "$ISSUE_BODY" | grep -A1 "New Value" | tail -n1 | xargs)
-
-          cat > requests/request-${{ github.event.issue.number }}.json <<EOF
-          {
-            "application": "$APPLICATION",
-            "section": "$SECTION",
-            "key": "$KEY",
-            "newValue": "$VALUE"
-          }
-          EOF
-
       - name: Commit Request
         run: |
           git config user.name "github-actions[bot]"
@@ -115,11 +95,11 @@ jobs:
 
           git add requests/
 
-          git commit -m "Configuration Request #${{ github.event.issue.number }}"
+          git commit -m "Configuration Request #${{ github.event.issue.number }}" || echo "No Changes"
 
       - name: Push Branch
         run: |
-          git push origin config-change-${{ github.event.issue.number }}
+          git push --force origin config-change-${{ github.event.issue.number }}
 
       - name: Create Pull Request
         env:
