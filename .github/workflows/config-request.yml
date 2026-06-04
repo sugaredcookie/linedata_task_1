@@ -84,6 +84,12 @@ jobs:
       - name: Create Request File
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          node scripts/create-request-file.js
+
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
 
           mkdir -p requests
