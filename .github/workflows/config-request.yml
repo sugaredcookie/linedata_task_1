@@ -1,0 +1,117 @@
+name: Configuration Request
+
+on:
+  issues:
+    types: [opened]
+
+permissions:
+  contents: write
+  pull-requests: write
+  issues: write
+
+jobs:
+
+  dev:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: DEV Validation
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/dev-validation.js
+
+  qa:
+    needs: dev
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: QA Validation
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/qa-validation.js
+
+  uat:
+    needs: qa
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: UAT Validation
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node scripts/uat-validation.js
+
+  create-pr:
+    needs: uat
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: Create Branch
+        run: |
+          git checkout -b config-change-${{ github.event.issue.number }}
+
+      - name: Apply Configuration Change
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          node engine/process-request.js
+
+      - name: Commit Changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          git commit -m "Configuration Change Issue #${{ github.event.issue.number }}"
+
+      - name: Push Branch
+        run: |
+          git push origin config-change-${{ github.event.issue.number }}
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: config-change-${{ github.event.issue.number }}
+          base: main
+          title: "Configuration Change #${{ github.event.issue.number }}"
+          body: |
+            Auto-generated from issue #${{ github.event.issue.number }}

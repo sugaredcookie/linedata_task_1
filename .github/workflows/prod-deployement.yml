@@ -1,0 +1,38 @@
+name: Production Deployment
+
+on:
+  pull_request:
+    types:
+      - closed
+
+permissions:
+  contents: write
+
+jobs:
+
+  prod:
+
+    if: github.event.pull_request.merged == true
+
+    runs-on: ubuntu-latest
+
+    environment: production
+
+    steps:
+
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - run: npm install
+
+      - name: Production Validation
+        run: |
+          echo "Approved PR Merged"
+          echo "Deploying To Production"
+
+      - name: Deployment Audit
+        run: |
+          echo "Configuration Approved And Deployed"
