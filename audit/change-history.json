@@ -44,5 +44,14 @@
     "oldValue": "DR",
     "newValue": "PROD",
     "status": "SUCCESS"
+  },
+  {
+    "timestamp": "2026-06-04T11:14:20.398Z",
+    "application": "RECON",
+    "section": "shared_tokens",
+    "key": "PortalEnvironment",
+    "oldValue": "DR",
+    "newValue": "PROD",
+    "status": "SUCCESS"
   }
 ]
