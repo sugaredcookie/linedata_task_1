@@ -1,101 +1,137 @@
 name: Configuration Pipeline
 
 on:
-  issues:
-    types: [opened]
+issues:
+types: [opened]
 
 permissions:
-  contents: write
-  issues: write
-  pull-requests: write
+contents: write
+issues: write
+pull-requests: write
 
 jobs:
-  dev:
-    name: DEV - Proposal
-    runs-on: ubuntu-latest
 
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+dev:
+name: DEV - Validation
+runs-on: ubuntu-latest
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm install
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      - name: DEV Validation & Processing
-        env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
-          ISSUE_TITLE: ${{ github.event.issue.title }}
-          ISSUE_NUMBER: ${{ github.event.issue.number }}
-        run: node scripts/dev-validation.js
+  - name: Setup Node
+    uses: actions/setup-node@v4
+    with:
+      node-version: 22
+      cache: npm
 
-  qa:
-    name: QA - Validation
-    needs: dev
-    runs-on: ubuntu-latest
-    environment: qa
+  - name: Install Dependencies
+    run: npm install
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-      - run: npm install
-      - name: QA Validation
-        run: node scripts/qa-validation.js
+  - name: DEV Validation
+    env:
+      ISSUE_BODY: ${{ github.event.issue.body }}
+      ISSUE_TITLE: ${{ github.event.issue.title }}
+      ISSUE_NUMBER: ${{ github.event.issue.number }}
+    run: |
+      node scripts/dev-validation.js
 
-  uat:
-    name: UAT - Validation
-    needs: qa
-    runs-on: ubuntu-latest
-    environment: uat
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-      - run: npm install
-      - name: UAT Validation
-        run: node scripts/uat-validation.js
+qa:
+name: QA - Validation
+needs: dev
+runs-on: ubuntu-latest
+environment: qa
 
-  prod:
-    name: PROD - Deployment
-    needs: uat
-    runs-on: ubuntu-latest
-    environment: production   # ← Manual Approval Gate Added Here
 
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-          cache: 'npm'
-      - run: npm install
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
 
-      - name: PROD Validation
-        run: |
-          echo "All validations passed (DEV → QA → UAT)"
-          echo "Ready for Production Deployment"
+  - name: Setup Node
+    uses: actions/setup-node@v4
+    with:
+      node-version: 22
+      cache: npm
 
-      - name: Run Configuration Processing Engine
-        env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
-        run: node engine/process-request.js
+  - name: Install Dependencies
+    run: npm install
 
-      - name: Commit & Push Changes
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add .
-          git commit -m "chore(config): deploy to PROD via Issue" || echo "No changes to commit"
-          git push
+  - name: QA Validation
+    env:
+      ISSUE_BODY: ${{ github.event.issue.body }}
+    run: |
+      node scripts/qa-validation.js
+
+
+uat:
+name: UAT - Validation
+needs: qa
+runs-on: ubuntu-latest
+environment: uat
+
+
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
+
+  - name: Setup Node
+    uses: actions/setup-node@v4
+    with:
+      node-version: 22
+      cache: npm
+
+  - name: Install Dependencies
+    run: npm install
+
+  - name: UAT Validation
+    env:
+      ISSUE_BODY: ${{ github.event.issue.body }}
+    run: |
+      node scripts/uat-validation.js
+
+
+prod:
+name: PROD - Deployment
+needs: uat
+runs-on: ubuntu-latest
+environment: production
+
+
+steps:
+  - name: Checkout Repository
+    uses: actions/checkout@v4
+
+  - name: Setup Node
+    uses: actions/setup-node@v4
+    with:
+      node-version: 22
+      cache: npm
+
+  - name: Install Dependencies
+    run: npm install
+
+  - name: PROD Validation
+    run: |
+      echo "DEV Passed"
+      echo "QA Passed"
+      echo "UAT Passed"
+      echo "Ready For Production Deployment"
+
+  - name: Run Configuration Processing Engine
+    env:
+      ISSUE_BODY: ${{ github.event.issue.body }}
+    run: |
+      node engine/process-request.js
+
+  - name: Commit And Push Changes
+    run: |
+      git config user.name "github-actions[bot]"
+      git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      git add .
+
+      git commit -m "chore(config): deploy to PROD via Issue" || echo "No changes to commit"
+
+      git push

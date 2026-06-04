@@ -2,6 +2,10 @@ const body = process.env.ISSUE_BODY;
 
 function extract(label) {
 
+    if(!body) {
+        throw new Error("env variable not found !!");
+    }
+
   const lines = body.split("\n");
 
   for (let i = 0; i < lines.length; i++) {
