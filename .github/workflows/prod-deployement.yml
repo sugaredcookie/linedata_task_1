@@ -10,7 +10,7 @@ permissions:
 
 jobs:
 
-  prod:
+  deploy:
 
     if: github.event.pull_request.merged == true
 
@@ -28,11 +28,18 @@ jobs:
 
       - run: npm install
 
-      - name: Production Validation
+      - name: Deploy Approved Request
         run: |
-          echo "Approved PR Merged"
-          echo "Deploying To Production"
+          node engine/process-request-from-file.js
 
-      - name: Deployment Audit
+      - name: Commit Updated Database
         run: |
-          echo "Configuration Approved And Deployed"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add .
+
+          git commit -m "Production Deployment" || echo "No Changes"
+
+          git push

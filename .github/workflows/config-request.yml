@@ -77,41 +77,50 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - run: npm install
-
       - name: Create Branch
         run: |
           git checkout -b config-change-${{ github.event.issue.number }}
 
-      - name: Apply Configuration Change
+      - name: Create Request File
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: |
-          node engine/process-request.js
 
-      - name: Commit Changes
+          mkdir -p requests
+
+          APPLICATION=$(echo "$ISSUE_BODY" | grep -A1 "Application Name" | tail -n1 | xargs)
+          SECTION=$(echo "$ISSUE_BODY" | grep -A1 "Section Name" | tail -n1 | xargs)
+          KEY=$(echo "$ISSUE_BODY" | grep -A1 "Configuration Key" | tail -n1 | xargs)
+          VALUE=$(echo "$ISSUE_BODY" | grep -A1 "New Value" | tail -n1 | xargs)
+
+          cat > requests/request-${{ github.event.issue.number }}.json <<EOF
+          {
+            "application": "$APPLICATION",
+            "section": "$SECTION",
+            "key": "$KEY",
+            "newValue": "$VALUE"
+          }
+          EOF
+
+      - name: Commit Request
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          git add .
+          git add requests/
 
-          git commit -m "Configuration Change Issue #${{ github.event.issue.number }}"
+          git commit -m "Configuration Request #${{ github.event.issue.number }}"
 
       - name: Push Branch
         run: |
           git push origin config-change-${{ github.event.issue.number }}
 
       - name: Create Pull Request
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: config-change-${{ github.event.issue.number }}
-          base: main
-          title: "Configuration Change #${{ github.event.issue.number }}"
-          body: |
-            Auto-generated from issue #${{ github.event.issue.number }}
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh pr create \
+            --base main \
+            --head config-change-${{ github.event.issue.number }} \
+            --title "Configuration Change #${{ github.event.issue.number }}" \
+            --body "Awaiting Approval"
