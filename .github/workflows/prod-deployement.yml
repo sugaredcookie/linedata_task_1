@@ -21,7 +21,7 @@ jobs:
 
     steps:
 
-      - name: Checkout Repository
+      - name: Checkout Workflow Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
@@ -34,6 +34,22 @@ jobs:
 
       - name: Install Dependencies
         run: npm install
+
+      - name: Generate App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+          owner: sugaredcookie
+          repositories: linedata-config-store
+
+      - name: Checkout Config Repository
+        uses: actions/checkout@v4
+        with:
+          repository: sugaredcookie/linedata-config-store
+          token: ${{ steps.app-token.outputs.token }}
+          path: config-repo
 
       - name: Debug PR Information
         run: |
@@ -57,11 +73,6 @@ jobs:
 
           echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
 
-      - name: Show Request Files
-        run: |
-          echo "Available request files:"
-          ls -la requests || true
-
       - name: Verify Request File Exists
         run: |
 
@@ -74,7 +85,6 @@ jobs:
             exit 1
           fi
 
-          echo "Request file contents:"
           cat "$REQUEST_FILE"
 
       - name: Deploy Approved Request
@@ -83,14 +93,30 @@ jobs:
         run: |
           node engine/process-request-from-file.js
 
-      - name: Commit Updated Database & Configs
+      - name: Verify Config Changes
+        run: |
+          echo "===== CONFIG REPO ====="
+          ls -R config-repo
+
+      - name: Commit Config Changes
         run: |
 
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
+          cd config-repo
+
+          git config user.name "Config Bot"
+          git config user.email "bot@demo.com"
 
           git add .
 
-          git commit -m "Production Deployment - Issue ${ISSUE_NUMBER}" || echo "No changes to commit"
+          git commit -m "Production Deployment Issue ${ISSUE_NUMBER}" || echo "No changes"
+
+      - name: Push Config Changes
+        env:
+          TOKEN: ${{ steps.app-token.outputs.token }}
+        run: |
+
+          cd config-repo
+
+          git remote set-url origin https://x-access-token:${TOKEN}@github.com/sugaredcookie/linedata-config-store.git
 
           git push origin HEAD:main
