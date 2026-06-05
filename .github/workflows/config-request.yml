@@ -6,107 +6,116 @@ on:
 
 permissions:
   contents: write
-  pull-requests: write
   issues: write
+  pull-requests: write
 
 jobs:
-
   dev:
+    name: DEV - Validation
     runs-on: ubuntu-latest
-
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
+          cache: 'npm'
 
-      - run: npm install
+      - name: Install Dependencies
+        run: npm install
 
       - name: DEV Validation
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
-        run: |
-          node scripts/dev-validation.js
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: node scripts/dev-validation.js
 
   qa:
+    name: QA - Validation
     needs: dev
     runs-on: ubuntu-latest
-
+    environment: qa
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - run: npm install
-
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm install
       - name: QA Validation
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
-        run: |
-          node scripts/qa-validation.js
+        run: node scripts/qa-validation.js
 
   uat:
+    name: UAT - Validation
     needs: qa
     runs-on: ubuntu-latest
-
+    environment: uat
     steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
         with:
           node-version: 22
-
-      - run: npm install
-
+          cache: 'npm'
+      - name: Install Dependencies
+        run: npm install
       - name: UAT Validation
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
-        run: |
-          node scripts/uat-validation.js
+        run: node scripts/uat-validation.js
 
   create-pr:
+    name: Create Pull Request
     needs: uat
     runs-on: ubuntu-latest
 
     steps:
-
-      - uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Create Branch
-        run: |
-          git checkout -b config-change-${{ github.event.issue.number }}
-
-      - name: Create Request File
+      - name: Create Branch and Pull Request
         env:
-          ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
+          ISSUE_TITLE: ${{ github.event.issue.title }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          node scripts/create-request-file.js
-
-      - name: Commit Request
-        run: |
+          BRANCH_NAME="feature/config-change-${ISSUE_NUMBER}"
+          
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          git add requests/
-
-          git commit -m "Configuration Request #${{ github.event.issue.number }}" || echo "No Changes"
-
-      - name: Push Branch
-        run: |
-          git push --force origin config-change-${{ github.event.issue.number }}
-
-      - name: Create Pull Request
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          gh pr create \
+          
+          git checkout -b $BRANCH_NAME
+          git add config/ requests/ || true
+          
+          if git diff --staged --quiet; then
+            git commit --allow-empty -m "chore(config): update via Issue #${ISSUE_NUMBER}"
+          else
+            git commit -m "chore(config): update via Issue #${ISSUE_NUMBER}"
+          fi
+          
+          git push -f --set-upstream origin $BRANCH_NAME
+          
+          # Create PR with labels
+          PR_URL=$(gh pr create \
             --base main \
-            --head config-change-${{ github.event.issue.number }} \
-            --title "Configuration Change #${{ github.event.issue.number }}" \
-            --body "Awaiting Approval"
+            --head $BRANCH_NAME \
+            --title "Configuration Change #${ISSUE_NUMBER} - ${ISSUE_TITLE}" \
+            --body "Automated configuration update from Issue #${ISSUE_NUMBER}\n\nCloses #${ISSUE_NUMBER}" \
+            --label "config-change" \
+            --label "database" || echo "PR already exists")
+          
+          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+          
+          # Comment on original Issue
+          gh issue comment ${{ github.event.issue.number }} --body "✅ **Pull Request Created!**\n\nPR: $PR_URL\n\nPlease review the changes and merge to proceed with deployment."
