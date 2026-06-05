@@ -16,6 +16,11 @@ console.log(request);
 
 const db = new sqlite3.Database("./database/demo.db");
 
+console.log(
+  "DB Path:",
+  require("path").resolve("./database/demo.db")
+);
+
 db.all(
 `
 SELECT
@@ -29,43 +34,48 @@ FROM config_entries
 
   if(err){
     console.error(err);
-    return;
+    process.exit(1);
   }
 
   console.log("Available Configurations:");
   console.table(rows);
 
-});
+  db.get(
+  `
+  SELECT *
+  FROM config_entries
+  WHERE application = ?
+  AND section_name = ?
+  AND key_name = ?
+  `,
+  [
+    request.application,
+    request.section,
+    request.key
+  ],
+  (err,row)=>{
 
-db.get(
-`
-SELECT *
-FROM config_entries
-WHERE application = ?
-AND section_name = ?
-AND key_name = ?
-`,
-[
-  request.application,
-  request.section,
-  request.key
-],
-(err,row)=>{
+    if(err){
+      console.error(err);
+      process.exit(1);
+    }
 
-  if(!row){
+    if(!row){
 
-    console.error(
-      "Configuration Not Found"
+      console.error(
+        "Configuration Not Found"
+      );
+
+      process.exit(1);
+
+    }
+
+    console.log(
+      "DEV Validation Passed"
     );
 
-    process.exit(1);
+    db.close();
 
-  }
-
-  console.log(
-    "DEV Validation Passed"
-  );
-
-  db.close();
+  });
 
 });
