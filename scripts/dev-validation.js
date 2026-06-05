@@ -7,6 +7,10 @@ const sqlite3 =
 const request =
   parse(process.env.ISSUE_BODY);
 
+console.log("===== ISSUE BODY =====");
+console.log(process.env.ISSUE_BODY);
+console.log("======================");
+
 console.log("Parsed Request:");
 console.log(request);
 
