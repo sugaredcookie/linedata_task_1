@@ -18,8 +18,10 @@ jobs:
         id: app-token
         uses: actions/create-github-app-token@v1
         with:
-          app-id: ${{ secrets.APP_ID }}
-          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+            app-id: ${{ secrets.APP_ID }}
+            private-key: ${{ secrets.APP_PRIVATE_KEY }}
+            owner: sugaredcookie
+            repositories: linedata-config-store
 
       - name: Checkout Config Repo
         uses: actions/checkout@v4
@@ -58,6 +60,11 @@ jobs:
           git add .
 
           git commit -m "Update PortalEnvironment to DR" || echo "No changes"
+
+      - name: Debug Remote
+        run: |
+            cd config-repo
+            git remote -v
 
       - name: Push Changes
         env:
