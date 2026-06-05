@@ -60,6 +60,12 @@ jobs:
           git commit -m "Update PortalEnvironment to DR" || echo "No changes"
 
       - name: Push Changes
+        env:
+            TOKEN: ${{ steps.app-token.outputs.token }}
         run: |
-          cd config-repo
-          git push
+            cd config-repo
+
+            git remote set-url origin \
+            https://x-access-token:${TOKEN}@github.com/sugaredcookie/linedata-config-store.git
+
+            git push
