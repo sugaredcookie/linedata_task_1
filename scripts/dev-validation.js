@@ -14,8 +14,28 @@ console.log("======================");
 console.log("Parsed Request:");
 console.log(request);
 
-const db =
-  new sqlite3.Database("./database/demo.db");
+const db = new sqlite3.Database("./database/demo.db");
+
+db.all(
+`
+SELECT
+application,
+section_name,
+key_name
+FROM config_entries
+`,
+[],
+(err, rows) => {
+
+  if(err){
+    console.error(err);
+    return;
+  }
+
+  console.log("Available Configurations:");
+  console.table(rows);
+
+});
 
 db.get(
 `
