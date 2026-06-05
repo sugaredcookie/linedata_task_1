@@ -76,3 +76,6 @@ jobs:
             https://x-access-token:${TOKEN}@github.com/sugaredcookie/linedata-config-store.git
 
             git push
+
+
+            
