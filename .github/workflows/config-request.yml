@@ -79,43 +79,79 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: Create Branch and Pull Request
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Dependencies
+        run: npm install
+
+      - name: Create Branch
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git checkout -b feature/config-change-${ISSUE_NUMBER}
+
+      - name: Create Request File
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          node scripts/create-request-file.js
+
+      - name: Verify Request File
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          echo "Generated Request File:"
+          cat requests/request-${ISSUE_NUMBER}.json
+
+      - name: Commit Changes
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          git add requests/
+
+          git commit -m "Configuration Request ${ISSUE_NUMBER}" || echo "No changes"
+
+      - name: Push Branch
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+        run: |
+          git push --force --set-upstream origin feature/config-change-${ISSUE_NUMBER}
+
+      - name: Create Pull Request
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          BRANCH_NAME="feature/config-change-${ISSUE_NUMBER}"
-          
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          
-          git checkout -b $BRANCH_NAME
-          git add config/ requests/ || true
-          
-          if git diff --staged --quiet; then
-            git commit --allow-empty -m "chore(config): update via Issue #${ISSUE_NUMBER}"
-          else
-            git commit -m "chore(config): update via Issue #${ISSUE_NUMBER}"
-          fi
-          
-          git push -f --set-upstream origin $BRANCH_NAME
-          
-          # Create PR with labels
+
           PR_URL=$(gh pr create \
             --base main \
-            --head $BRANCH_NAME \
-            --title "Configuration Change #${ISSUE_NUMBER} - ${ISSUE_TITLE}" \
-            --body "Automated configuration update from Issue #${ISSUE_NUMBER}\n\nCloses #${ISSUE_NUMBER}" \
-            --label "config-change" \
-            --label "database" || echo "PR already exists")
-          
-          echo "PR_URL=$PR_URL" >> $GITHUB_ENV
-          
-          # Comment on original Issue
-          gh issue comment ${{ github.event.issue.number }} --body "✅ **Pull Request Created!**\n\nPR: $PR_URL\n\nPlease review the changes and merge to proceed with deployment."
+            --head feature/config-change-${ISSUE_NUMBER} \
+            --title "Configuration Change ${ISSUE_NUMBER} - ${ISSUE_TITLE}" \
+            --body "ISSUE_NUMBER=${ISSUE_NUMBER}
+
+          Automated configuration request from Issue ${ISSUE_NUMBER}" \
+                    --label "config-change" \
+                    --label "database")
+
+                  echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+
+                  gh issue comment ${ISSUE_NUMBER} \
+                    --body "✅ Pull Request Created
+
+          PR: $PR_URL
+
+          Please review and merge for production deployment."

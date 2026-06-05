@@ -8,13 +8,19 @@ permissions:
   contents: write
 
 jobs:
+
   deploy:
+
     if: github.event.pull_request.merged == true
+
     name: PROD - Deployment
+
     runs-on: ubuntu-latest
+
     environment: production
 
     steps:
+
       - name: Checkout Repository
         uses: actions/checkout@v4
         with:
@@ -24,20 +30,67 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: npm
 
       - name: Install Dependencies
         run: npm install
 
+      - name: Debug PR Information
+        run: |
+          echo "PR Number: ${{ github.event.pull_request.number }}"
+          echo "PR Title: ${{ github.event.pull_request.title }}"
+          echo "----- PR BODY -----"
+          echo "${{ github.event.pull_request.body }}"
+          echo "-------------------"
+
+      - name: Extract Issue Number
+        run: |
+
+          ISSUE_NUMBER=$(echo "${{ github.event.pull_request.body }}" | grep "ISSUE_NUMBER=" | cut -d= -f2)
+
+          echo "Extracted Issue Number: $ISSUE_NUMBER"
+
+          if [ -z "$ISSUE_NUMBER" ]; then
+            echo "Failed to extract ISSUE_NUMBER from PR body"
+            exit 1
+          fi
+
+          echo "ISSUE_NUMBER=$ISSUE_NUMBER" >> $GITHUB_ENV
+
+      - name: Show Request Files
+        run: |
+          echo "Available request files:"
+          ls -la requests || true
+
+      - name: Verify Request File Exists
+        run: |
+
+          REQUEST_FILE="requests/request-${ISSUE_NUMBER}.json"
+
+          echo "Looking for: $REQUEST_FILE"
+
+          if [ ! -f "$REQUEST_FILE" ]; then
+            echo "Request file not found"
+            exit 1
+          fi
+
+          echo "Request file contents:"
+          cat "$REQUEST_FILE"
+
       - name: Deploy Approved Request
         env:
-          ISSUE_NUMBER: ${{ github.event.pull_request.number }}
-        run: node engine/process-request-from-file.js
+          ISSUE_NUMBER: ${{ env.ISSUE_NUMBER }}
+        run: |
+          node engine/process-request-from-file.js
 
       - name: Commit Updated Database & Configs
         run: |
+
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+
           git add .
-          git commit -m "Production Deployment - Issue #${{ github.event.pull_request.number }}" || echo "No changes to commit"
+
+          git commit -m "Production Deployment - Issue ${ISSUE_NUMBER}" || echo "No changes to commit"
+
           git push origin HEAD:main
