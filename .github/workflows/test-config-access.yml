@@ -1,0 +1,30 @@
+name: Test Config Repo Access
+
+on:
+  workflow_dispatch:
+
+jobs:
+
+  test:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Generate App Token
+        id: app-token
+        uses: actions/create-github-app-token@v1
+        with:
+          app-id: ${{ secrets.APP_ID }}
+          private-key: ${{ secrets.APP_PRIVATE_KEY }}
+
+      - name: Checkout Config Repo
+        uses: actions/checkout@v4
+        with:
+          repository: sugaredcookie/linedata-config-store
+          token: ${{ steps.app-token.outputs.token }}
+          path: config-repo
+
+      - name: Show Files
+        run: |
+          ls -R config-repo
