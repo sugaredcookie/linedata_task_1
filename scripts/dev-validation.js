@@ -7,6 +7,9 @@ const sqlite3 =
 const request =
   parse(process.env.ISSUE_BODY);
 
+console.log("Parsed Request:");
+console.log(request);
+
 const db =
   new sqlite3.Database("./database/demo.db");
 
