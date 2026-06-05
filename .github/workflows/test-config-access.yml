@@ -11,6 +11,9 @@ jobs:
 
     steps:
 
+      - name: Checkout Workflow Repo
+        uses: actions/checkout@v4
+
       - name: Generate App Token
         id: app-token
         uses: actions/create-github-app-token@v1
@@ -25,8 +28,15 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           path: config-repo
 
-      - name: Show Files
+      - name: Show Workflow Repo Files
         run: |
+          echo "===== WORKFLOW REPO ====="
+          ls -R scripts
+          ls -R engine
+
+      - name: Show Config Repo Files
+        run: |
+          echo "===== CONFIG REPO ====="
           ls -R config-repo
 
       - name: Update Config
