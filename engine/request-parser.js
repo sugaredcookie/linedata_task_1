@@ -40,6 +40,15 @@ module.exports = function(body) {
     newValue:
       extract(body, "New Value"),
 
+    currentEnvironment:
+      extract(body, "Current Environment"),
+
+    targetEnvironment:
+      extract(body, "Target Environment"),
+
+    version:
+      extract(body, "Version"),
+
     reason:
       extract(body, "Change Reason")
 

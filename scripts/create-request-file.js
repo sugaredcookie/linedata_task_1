@@ -19,23 +19,39 @@ function extract(label) {
 }
 
 const request = {
-  application: extract("Application Name"),
-  section: extract("Section Name"),
-  key: extract("Configuration Key"),
-  newValue: extract("New Value"),
-  reason: extract("Change Reason")
+
+  application:
+    extract("Application Name"),
+
+  currentEnvironment:
+    extract("Current Environment"),
+
+  targetEnvironment:
+    extract("Target Environment"),
+
+  version:
+    extract("Version"),
+
+  reason:
+    extract("Change Reason")
+
 };
 
 console.log("Generated Request:");
 console.log(request);
 
-fs.mkdirSync("requests", {
-  recursive: true
-});
+fs.mkdirSync(
+  "requests",
+  { recursive: true }
+);
 
 fs.writeFileSync(
   `requests/request-${process.env.ISSUE_NUMBER}.json`,
-  JSON.stringify(request, null, 2)
+  JSON.stringify(
+    request,
+    null,
+    2
+  )
 );
 
 console.log(

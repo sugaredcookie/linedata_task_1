@@ -16,22 +16,21 @@ const TRIGGERED_BY =
 
 function ensureLogFile() {
 
-  if (!fs.existsSync(LOG_FILE)) {
+  if(!fs.existsSync(LOG_FILE)) {
 
     fs.writeFileSync(
       LOG_FILE,
-      `# Configuration Changes Log - Started ${new Date().toISOString()}\n\n`
+      `# Promotion Log Started ${new Date().toISOString()}\n\n`
     );
 
   }
 
 }
 
-function logChange(
-  operation,
-  change,
+function logPromotion(
+  request,
   status = "SUCCESS"
-) {
+){
 
   ensureLogFile();
 
@@ -41,11 +40,11 @@ function logChange(
   const logEntry =
     `[${timestamp}] ISSUE#${ISSUE_NUMBER} | ` +
     `By: ${TRIGGERED_BY} | ` +
-    `${operation.toUpperCase()} | ` +
-    `App: ${change.application} | ` +
-    `Section: ${change.section || "N/A"} | ` +
-    `Key: ${change.key} | ` +
-    `New Value: ${change.newValue} | ` +
+    `PROMOTION | ` +
+    `App: ${request.application} | ` +
+    `From: ${request.currentEnvironment} | ` +
+    `To: ${request.targetEnvironment} | ` +
+    `Version: ${request.version} | ` +
     `Status: ${status}\n`;
 
   fs.appendFileSync(
@@ -63,7 +62,11 @@ console.log(
   requestFile
 );
 
-if (!fs.existsSync(requestFile)) {
+if(
+  !fs.existsSync(
+    requestFile
+  )
+){
 
   throw new Error(
     `Request File Not Found: ${requestFile}`
@@ -85,30 +88,33 @@ console.log(
 
 console.log(request);
 
-const change = {
+try {
 
-  application:
-    request.application,
+  require("./promotion-handler")(
+    request
+  );
 
-  section:
-    request.section,
+  logPromotion(
+    request,
+    "SUCCESS"
+  );
 
-  key:
-    request.key,
+  console.log(
+    "Promotion Completed"
+  );
 
-  newValue:
-    request.newValue,
+}
+catch(error){
 
-  reason:
-    request.reason ||
-    "Approved via PR"
+  logPromotion(
+    request,
+    "FAILED"
+  );
 
-};
+  console.error(
+    error.message
+  );
 
-console.log(
-  "Approved Request:"
-);
+  process.exit(1);
 
-console.log(change);
-
-require("./json-handler")(change);
+}

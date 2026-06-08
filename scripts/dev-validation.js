@@ -1,81 +1,40 @@
 const parse =
   require("../engine/request-parser");
 
-const sqlite3 =
-  require("sqlite3").verbose();
-
 const request =
   parse(process.env.ISSUE_BODY);
 
-console.log("===== ISSUE BODY =====");
-console.log(process.env.ISSUE_BODY);
-console.log("======================");
-
-console.log("Parsed Request:");
-console.log(request);
-
-const db = new sqlite3.Database("./database/demo.db");
-
 console.log(
-  "DB Path:",
-  require("path").resolve("./database/demo.db")
+  "Parsed Request:"
 );
 
-db.all(
-`
-SELECT
-application,
-section_name,
-key_name
-FROM config_entries
-`,
-[],
-(err, rows) => {
+console.log(request);
 
-  if(err){
-    console.error(err);
-    process.exit(1);
-  }
+if(
+  !request.application
+){
 
-  console.log("Available Configurations:");
-  console.table(rows);
+  console.error(
+    "Application Missing"
+  );
 
-  db.get(
-  `
-  SELECT *
-  FROM config_entries
-  WHERE application = ?
-  AND section_name = ?
-  AND key_name = ?
-  `,
-  [
-    request.application,
-    request.section,
-    request.key
-  ],
-  (err,row)=>{
+  process.exit(1);
 
-    if(err){
-      console.error(err);
-      process.exit(1);
-    }
+}
 
-    if(!row){
+if(
+  request.currentEnvironment ===
+  request.targetEnvironment
+){
 
-      console.error(
-        "Configuration Not Found"
-      );
+  console.error(
+    "Source and Target Environment Cannot Match"
+  );
 
-      process.exit(1);
+  process.exit(1);
 
-    }
+}
 
-    console.log(
-      "DEV Validation Passed"
-    );
-
-    db.close();
-
-  });
-
-});
+console.log(
+  "DEV Validation Passed"
+);

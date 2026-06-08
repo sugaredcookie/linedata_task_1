@@ -4,24 +4,23 @@ const parse =
 const request =
   parse(process.env.ISSUE_BODY);
 
-const allowedValues = [
+const transitions = {
 
-  "DEV",
-  "QA",
-  "UAT",
-  "DR",
-  "PROD"
+  DEV: "QA",
+  QA: "UAT",
+  UAT: "PROD"
 
-];
+};
 
 if(
-  !allowedValues.includes(
-    request.newValue
-  )
+  transitions[
+    request.currentEnvironment
+  ] !==
+  request.targetEnvironment
 ){
 
   console.error(
-    "Invalid Value"
+    "Invalid Environment Transition"
   );
 
   process.exit(1);
