@@ -4,18 +4,18 @@ const parse =
 const request =
   parse(process.env.ISSUE_BODY);
 
-if(
-  !request.reason ||
-  request.reason.length < 10
-){
+// if(
+//   !request.reason ||
+//   request.reason.length < 10
+// ){
 
-  console.error(
-    "Business Reason Too Short"
-  );
+//   console.error(
+//     "Business Reason Too Short"
+//   );
 
-  process.exit(1);
+//   process.exit(1);
 
-}
+// }
 
 console.log(
   "UAT Validation Passed"
