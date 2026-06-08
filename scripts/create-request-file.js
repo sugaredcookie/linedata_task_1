@@ -1,6 +1,6 @@
 const fs = require("fs");
 
-const body = process.env.ISSUE_BODY;
+const body = process.env.ISSUE_BODY || "";
 
 function extract(label) {
 
@@ -9,7 +9,17 @@ function extract(label) {
   for(let i = 0; i < lines.length; i++) {
 
     if(lines[i].includes(label)) {
-      return lines[i + 2]?.trim() || "";
+
+      for(let j = i + 1; j < lines.length; j++) {
+
+        const value = lines[j].trim();
+
+        if(value !== "") {
+          return value;
+        }
+
+      }
+
     }
 
   }
@@ -17,6 +27,10 @@ function extract(label) {
   return "";
 
 }
+
+console.log("===== ISSUE BODY =====");
+console.log(body);
+console.log("======================");
 
 const request = {
 
@@ -42,7 +56,9 @@ console.log(request);
 
 fs.mkdirSync(
   "requests",
-  { recursive: true }
+  {
+    recursive: true
+  }
 );
 
 fs.writeFileSync(
