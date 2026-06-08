@@ -139,17 +139,17 @@ jobs:
 
           PR_URL=$(gh pr create \
             --base main \
-            --head feature/promotion-${ISSUE_NUMBER}--head feature/config-change-${ISSUE_NUMBER} \
+            --head feature/promotion-${ISSUE_NUMBER} \
             --title "Promotion Request ${ISSUE_NUMBER} - ${ISSUE_TITLE}" \
             --body "ISSUE_NUMBER=${ISSUE_NUMBER}
 
           Automated promotion request from Issue ${ISSUE_NUMBER}" \
-                    --label "promotion")
+                      --label "promotion")
 
-                  echo "PR_URL=$PR_URL" >> $GITHUB_ENV
+                    echo "PR_URL=$PR_URL" >> $GITHUB_ENV
 
-                  gh issue comment ${ISSUE_NUMBER} \
-                    --body "✅ Pull Request Created
+                    gh issue comment ${ISSUE_NUMBER} \
+                      --body "✅ Pull Request Created
 
           PR: $PR_URL
 
