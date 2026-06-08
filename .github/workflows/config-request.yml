@@ -144,7 +144,7 @@ jobs:
             --body "ISSUE_NUMBER=${ISSUE_NUMBER}
 
           Automated promotion request from Issue ${ISSUE_NUMBER}" \
-                    --label "promotion"
+                    --label "promotion")
 
                   echo "PR_URL=$PR_URL" >> $GITHUB_ENV
 
