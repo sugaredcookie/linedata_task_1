@@ -128,7 +128,7 @@ jobs:
         env:
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: |
-          git push --force --set-upstream origin feature/config-change-${ISSUE_NUMBER}
+          git push --force --set-upstream origin feature/promotion-${ISSUE_NUMBER}
 
       - name: Create Pull Request
         env:
@@ -139,7 +139,7 @@ jobs:
 
           PR_URL=$(gh pr create \
             --base main \
-            --head feature/config-change-${ISSUE_NUMBER} \
+            --head feature/promotion-${ISSUE_NUMBER}--head feature/config-change-${ISSUE_NUMBER} \
             --title "Promotion Request ${ISSUE_NUMBER} - ${ISSUE_TITLE}" \
             --body "ISSUE_NUMBER=${ISSUE_NUMBER}
 
