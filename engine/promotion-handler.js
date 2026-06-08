@@ -3,18 +3,21 @@ const path = require("path");
 
 module.exports = function(request) {
 
-  const csvPath =
-    path.join(
-      process.cwd(),
-      "config-repo",
-      "applications",
-      "applications.csv"
-    );
-
-  console.log(
-    "Updating:",
-    csvPath
+  const csvPath = path.join(
+    process.cwd(),
+    "config-repo",
+    "applications",
+    "applications.csv"
   );
+
+  const jsonPath = path.join(
+    process.cwd(),
+    "config-repo",
+    "applications",
+    "applications.json"
+  );
+
+  console.log("Updating:", csvPath);
 
   if (!fs.existsSync(csvPath)) {
 
@@ -33,9 +36,6 @@ module.exports = function(request) {
   const lines =
     csv.trim().split("\n");
 
-  const headers =
-    lines[0].split(",");
-
   const updatedRows =
     lines.map((line, index) => {
 
@@ -47,10 +47,10 @@ module.exports = function(request) {
         line.split(",");
 
       const application =
-        cols[0];
+        cols[0].trim();
 
       const environment =
-        cols[2];
+        cols[2].trim();
 
       if(
         application === request.application
@@ -81,9 +81,20 @@ module.exports = function(request) {
 
           cols[5] = "Live";
 
-        } else {
+        }
+        else if(
+          request.targetEnvironment ===
+          "UAT"
+        ){
 
-          cols[5] = "Testing";
+          cols[5] =
+            "Ready For Promotion";
+
+        }
+        else {
+
+          cols[5] =
+            "Testing";
 
         }
 
@@ -95,13 +106,66 @@ module.exports = function(request) {
 
     });
 
+  const updatedCsv =
+    updatedRows.join("\n");
+
   fs.writeFileSync(
     csvPath,
-    updatedRows.join("\n")
+    updatedCsv
   );
 
   console.log(
     "CSV Updated Successfully"
+  );
+
+  // ---------------------------
+  // Regenerate JSON
+  // ---------------------------
+
+  const csvLines =
+    updatedCsv.trim().split("\n");
+
+  const headers =
+    csvLines[0]
+      .split(",")
+      .map(h => h.trim());
+
+  const jsonData =
+    csvLines
+      .slice(1)
+      .map(line => {
+
+        const values =
+          line
+            .split(",")
+            .map(v => v.trim());
+
+        const obj = {};
+
+        headers.forEach(
+          (header, index) => {
+
+            obj[header] =
+              values[index];
+
+          }
+        );
+
+        return obj;
+
+      });
+
+  fs.writeFileSync(
+    jsonPath,
+    JSON.stringify(
+      jsonData,
+      null,
+      2
+    )
+  );
+
+  console.log(
+    "JSON Regenerated Successfully"
   );
 
 };
