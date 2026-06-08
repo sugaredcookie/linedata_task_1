@@ -31,15 +31,6 @@ module.exports = function(body) {
     application:
       extract(body, "Application Name"),
 
-    section:
-      extract(body, "Section Name"),
-
-    key:
-      extract(body, "Configuration Key"),
-
-    newValue:
-      extract(body, "New Value"),
-
     currentEnvironment:
       extract(body, "Current Environment"),
 
