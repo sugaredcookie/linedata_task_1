@@ -1,0 +1,7 @@
+{
+  "application": "TRADING",
+  "currentEnvironment": "UAT",
+  "targetEnvironment": "PROD",
+  "version": "1.8.4",
+  "reason": "Promotion request from dashboard"
+}
