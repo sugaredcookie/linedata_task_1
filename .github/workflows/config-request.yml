@@ -1,4 +1,4 @@
-name: Configuration Request
+name: Promotion Request
 
 on:
   issues:
@@ -10,9 +10,11 @@ permissions:
   pull-requests: write
 
 jobs:
-  dev:
-    name: DEV - Validation
+
+  request-validation:
+    name: Request Validation
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
@@ -21,61 +23,67 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: npm
 
       - name: Install Dependencies
         run: npm install
 
-      - name: DEV Validation
+      - name: Validate Promotion Request
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
           ISSUE_TITLE: ${{ github.event.issue.title }}
           ISSUE_NUMBER: ${{ github.event.issue.number }}
         run: node scripts/dev-validation.js
 
-  qa:
-    name: QA - Validation
-    needs: dev
+  business-validation:
+    name: Business Validation
+    needs: request-validation
     runs-on: ubuntu-latest
-    environment: qa
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: npm
+
       - name: Install Dependencies
         run: npm install
-      - name: QA Validation
+
+      - name: Validate Promotion Rules
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: node scripts/qa-validation.js
 
-  uat:
-    name: UAT - Validation
-    needs: qa
+  promotion-validation:
+    name: Promotion Validation
+    needs: business-validation
     runs-on: ubuntu-latest
-    environment: uat
+
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: npm
+
       - name: Install Dependencies
         run: npm install
-      - name: UAT Validation
+
+      - name: Validate Promotion Approval
         env:
           ISSUE_BODY: ${{ github.event.issue.body }}
         run: node scripts/uat-validation.js
 
   create-pr:
-    name: Create Pull Request
-    needs: uat
+    name: Create Promotion Pull Request
+    needs: promotion-validation
     runs-on: ubuntu-latest
 
     steps:
@@ -144,7 +152,7 @@ jobs:
             --body "ISSUE_NUMBER=${ISSUE_NUMBER}
 
           Automated promotion request from Issue ${ISSUE_NUMBER}" \
-                      --label "promotion")
+                      --label promotion)
 
                     echo "PR_URL=$PR_URL" >> $GITHUB_ENV
 
