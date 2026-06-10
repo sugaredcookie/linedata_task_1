@@ -1,0 +1,11 @@
+{
+  "client": "JP_MORGAN",
+  "application": "REPORTING",
+  "currentEnvironment": "PROD",
+  "targetEnvironment": "UAT",
+  "rollbackEnvironment": "",
+  "version": "3.0.0",
+  "rollbackVersion": "",
+  "requestType": "",
+  "reason": "Rollback requested from dashboard"
+}
