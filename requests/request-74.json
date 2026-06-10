@@ -1,0 +1,8 @@
+{
+  "client": "JP_MORGAN",
+  "application": "SETTLEMENTS",
+  "currentEnvironment": "DEV",
+  "targetEnvironment": "QA",
+  "version": "2.5.3",
+  "reason": "Promotion request from dashboard"
+}
