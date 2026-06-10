@@ -1,0 +1,11 @@
+{
+  "client": "CITI_BANK",
+  "application": "RECON",
+  "currentEnvironment": "QA",
+  "targetEnvironment": "DEV",
+  "rollbackEnvironment": "",
+  "version": "UAT",
+  "rollbackVersion": "",
+  "requestType": "",
+  "reason": "Rollback requested from dashboard"
+}
