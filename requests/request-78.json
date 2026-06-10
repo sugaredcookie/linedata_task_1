@@ -1,0 +1,11 @@
+{
+  "client": "JP_MORGAN",
+  "application": "TRADING",
+  "currentEnvironment": "UAT",
+  "targetEnvironment": "",
+  "rollbackEnvironment": "QA",
+  "version": "1.8.4",
+  "rollbackVersion": "1.8.3",
+  "requestType": "ROLLBACK",
+  "reason": "Production issue detected"
+}
