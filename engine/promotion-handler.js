@@ -52,17 +52,10 @@ module.exports = function(request) {
         console.log("COLS:", cols);
         console.log("COUNT:", cols.length);
 
-      const client =
-        cols[0].trim();
-
-      const application =
-        cols[1].trim();
-
-      const version =
-        cols[2].trim();
-
-      const environment =
-        cols[3].trim();
+        const client = cols[0]?.trim();
+        const application = cols[1]?.trim();
+        const version = cols[2]?.trim();
+        const environment = cols[3]?.trim();
 
       if(
 
