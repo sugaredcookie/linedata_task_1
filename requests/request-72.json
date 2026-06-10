@@ -1,0 +1,8 @@
+{
+  "client": "JP_MORGAN",
+  "application": "TRADING",
+  "currentEnvironment": "QA",
+  "targetEnvironment": "UAT",
+  "version": "1.8.4",
+  "reason": "Promotion request from dashboard"
+}
