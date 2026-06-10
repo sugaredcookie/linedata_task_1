@@ -4,42 +4,65 @@ const parse =
 const request =
   parse(process.env.ISSUE_BODY);
 
-if(
-  request.requestType ===
-  "ROLLBACK"
-){
-
-  console.log(
-    "Rollback QA Validation Passed"
-  );
-
-  process.exit(0);
-
-}
-
-const transitions = {
-
+const forwardTransitions = {
   DEV: "QA",
   QA: "UAT",
   UAT: "PROD"
-
 };
 
-if(
-  transitions[
-    request.currentEnvironment
-  ] !==
-  request.targetEnvironment
-){
+const rollbackTransitions = {
+  PROD: "UAT",
+  UAT: "QA",
+  QA: "DEV"
+};
 
-  console.error(
-    "Invalid Environment Transition"
+const isRollback =
+  request.reason &&
+  request.reason
+    .toLowerCase()
+    .includes("rollback");
+
+if (isRollback) {
+
+  if (
+    rollbackTransitions[
+      request.currentEnvironment
+    ] !==
+    request.targetEnvironment
+  ) {
+
+    console.error(
+      "Invalid Rollback Transition"
+    );
+
+    process.exit(1);
+
+  }
+
+  console.log(
+    "Rollback Validation Passed"
   );
 
-  process.exit(1);
+}
+else {
+
+  if (
+    forwardTransitions[
+      request.currentEnvironment
+    ] !==
+    request.targetEnvironment
+  ) {
+
+    console.error(
+      "Invalid Promotion Transition"
+    );
+
+    process.exit(1);
+
+  }
+
+  console.log(
+    "Promotion Validation Passed"
+  );
 
 }
-
-console.log(
-  "Promotion QA Validation Passed"
-);
