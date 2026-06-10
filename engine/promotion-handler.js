@@ -48,6 +48,10 @@ module.exports = function(request) {
       const cols =
         line.split(",");
 
+        console.log("LINE:", line);
+        console.log("COLS:", cols);
+        console.log("COUNT:", cols.length);
+
       const client =
         cols[0].trim();
 
