@@ -40,8 +40,17 @@ module.exports = function(body) {
     targetEnvironment:
       extract(body, "Target Environment"),
 
+    rollbackEnvironment:
+      extract(body, "Rollback Environment"),
+
     version:
       extract(body, "Version"),
+
+    rollbackVersion:
+      extract(body, "Rollback Version"),
+
+    requestType:
+      extract(body, "Request Type"),
 
     reason:
       extract(body, "Change Reason")

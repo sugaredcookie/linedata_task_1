@@ -23,6 +23,31 @@ if(
 }
 
 if(
+  request.requestType ===
+  "ROLLBACK"
+){
+
+  if(
+    !request.rollbackEnvironment
+  ){
+
+    console.error(
+      "Rollback Environment Missing"
+    );
+
+    process.exit(1);
+
+  }
+
+  console.log(
+    "Rollback Validation Passed"
+  );
+
+  process.exit(0);
+
+}
+
+if(
   request.currentEnvironment ===
   request.targetEnvironment
 ){
@@ -36,5 +61,5 @@ if(
 }
 
 console.log(
-  "DEV Validation Passed"
+  "Promotion Validation Passed"
 );

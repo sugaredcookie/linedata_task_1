@@ -4,6 +4,19 @@ const parse =
 const request =
   parse(process.env.ISSUE_BODY);
 
+if(
+  request.requestType ===
+  "ROLLBACK"
+){
+
+  console.log(
+    "Rollback QA Validation Passed"
+  );
+
+  process.exit(0);
+
+}
+
 const transitions = {
 
   DEV: "QA",
@@ -28,5 +41,5 @@ if(
 }
 
 console.log(
-  "QA Validation Passed"
+  "Promotion QA Validation Passed"
 );

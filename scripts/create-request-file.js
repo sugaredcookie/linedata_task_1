@@ -46,8 +46,17 @@ const request = {
   targetEnvironment:
     extract("Target Environment"),
 
+  rollbackEnvironment:
+    extract("Rollback Environment"),
+
   version:
     extract("Version"),
+
+  rollbackVersion:
+    extract("Rollback Version"),
+
+  requestType:
+    extract("Request Type"),
 
   reason:
     extract("Change Reason")

@@ -17,16 +17,6 @@ module.exports = function(request) {
     "applications.json"
   );
 
-  console.log("Updating:", csvPath);
-
-  if (!fs.existsSync(csvPath)) {
-
-    throw new Error(
-      `CSV file not found: ${csvPath}`
-    );
-
-  }
-
   const csv =
     fs.readFileSync(
       csvPath,
@@ -48,16 +38,11 @@ module.exports = function(request) {
       const cols =
         line.split(",");
 
-        console.log("LINE:", line);
-        console.log("COLS:", cols);
-        console.log("COUNT:", cols.length);
+      const client =
+        cols[0]?.trim();
 
-        const client = cols[0]?.trim();
-        const application = cols[1]?.trim();
-        const version = cols[2]?.trim();
-        const previousVersion = cols[3]?.trim();
-        const environment = cols[4]?.trim();
-        const previousEnvironment = cols[5]?.trim();
+      const application =
+        cols[1]?.trim();
 
       if(
 
@@ -68,51 +53,34 @@ module.exports = function(request) {
 
         found = true;
 
-        if(
-          environment !==
-          request.currentEnvironment
-        ){
+        const currentVersion =
+          cols[2];
 
-          throw new Error(
-            `Expected ${request.currentEnvironment} but found ${environment}`
-          );
+        const previousVersion =
+          cols[3];
 
-        }
+        const currentEnvironment =
+          cols[4];
 
-        console.log(
-          `Promoting ${client} | ${application}: ${environment} -> ${request.targetEnvironment}`
-        );
+        const previousEnvironment =
+          cols[5];
+
+        cols[2] =
+          previousVersion;
 
         cols[3] =
-          request.targetEnvironment;
+          currentVersion;
 
-        if(
-          request.targetEnvironment ===
-          "PROD"
-        ){
+        cols[4] =
+          previousEnvironment;
 
-          cols[8] = "Live";
+        cols[5] =
+          currentEnvironment;
 
-        }
-        else if(
-          request.targetEnvironment ===
-          "UAT"
-        ){
-
-          cols[8] =
-            "Ready For Promotion";
-
-        }
-        else {
-
-          cols[8] =
-            "Testing";
-
-        }
-
-        cols[10] = new Date()
-        .toISOString()
-        .split("T")[0];
+        cols[10] =
+          new Date()
+            .toISOString()
+            .split("T")[0];
 
         return cols.join(",");
 
@@ -125,7 +93,7 @@ module.exports = function(request) {
   if(!found){
 
     throw new Error(
-      `Application ${request.application} for client ${request.client} not found`
+      `Application ${request.application} not found`
     );
 
   }
@@ -136,10 +104,6 @@ module.exports = function(request) {
   fs.writeFileSync(
     csvPath,
     updatedCsv
-  );
-
-  console.log(
-    "CSV Updated Successfully"
   );
 
   const csvLines =
@@ -185,7 +149,7 @@ module.exports = function(request) {
   );
 
   console.log(
-    "JSON Regenerated Successfully"
+    "Rollback Completed"
   );
 
 };

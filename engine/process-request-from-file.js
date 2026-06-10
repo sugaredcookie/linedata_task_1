@@ -1,5 +1,10 @@
 const fs = require("fs");
 const path = require("path");
+const promotionHandler =
+  require("./promotion-handler");
+
+const rollbackHandler =
+  require("./rollback-handler");
 
 const LOG_FILE =
   path.join(
@@ -90,17 +95,35 @@ console.log(request);
 
 try {
 
-  require("./promotion-handler")(
-    request
-  );
+  if(
+    request.requestType ===
+    "ROLLBACK"
+  ){
+
+    rollbackHandler(
+      request
+    );
+
+    console.log(
+      "Rollback Completed"
+    );
+
+  }
+  else {
+
+    promotionHandler(
+      request
+    );
+
+    console.log(
+      "Promotion Completed"
+    );
+
+  }
 
   logPromotion(
     request,
     "SUCCESS"
-  );
-
-  console.log(
-    "Promotion Completed"
   );
 
 }
