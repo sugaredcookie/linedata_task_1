@@ -34,6 +34,9 @@ console.log("======================");
 
 const request = {
 
+  client:
+    extract("Client"),
+
   application:
     extract("Application Name"),
 

@@ -28,6 +28,9 @@ module.exports = function(body) {
 
   return {
 
+    client:
+      extract(body, "Client"),
+
     application:
       extract(body, "Application Name"),
 

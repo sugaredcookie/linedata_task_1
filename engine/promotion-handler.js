@@ -36,6 +36,8 @@ module.exports = function(request) {
   const lines =
     csv.trim().split("\n");
 
+  let found = false;
+
   const updatedRows =
     lines.map((line, index) => {
 
@@ -46,15 +48,26 @@ module.exports = function(request) {
       const cols =
         line.split(",");
 
-      const application =
+      const client =
         cols[0].trim();
 
-      const environment =
+      const application =
+        cols[1].trim();
+
+      const version =
         cols[2].trim();
 
+      const environment =
+        cols[3].trim();
+
       if(
+
+        client === request.client &&
         application === request.application
+
       ){
+
+        found = true;
 
         if(
           environment !==
@@ -68,10 +81,10 @@ module.exports = function(request) {
         }
 
         console.log(
-          `Promoting ${application}: ${environment} -> ${request.targetEnvironment}`
+          `Promoting ${client} | ${application}: ${environment} -> ${request.targetEnvironment}`
         );
 
-        cols[2] =
+        cols[3] =
           request.targetEnvironment;
 
         if(
@@ -79,7 +92,7 @@ module.exports = function(request) {
           "PROD"
         ){
 
-          cols[5] = "Live";
+          cols[6] = "Live";
 
         }
         else if(
@@ -87,16 +100,21 @@ module.exports = function(request) {
           "UAT"
         ){
 
-          cols[5] =
+          cols[6] =
             "Ready For Promotion";
 
         }
         else {
 
-          cols[5] =
+          cols[6] =
             "Testing";
 
         }
+
+        cols[8] =
+          new Date()
+            .toISOString()
+            .split("T")[0];
 
         return cols.join(",");
 
@@ -105,6 +123,14 @@ module.exports = function(request) {
       return line;
 
     });
+
+  if(!found){
+
+    throw new Error(
+      `Application ${request.application} for client ${request.client} not found`
+    );
+
+  }
 
   const updatedCsv =
     updatedRows.join("\n");
@@ -117,10 +143,6 @@ module.exports = function(request) {
   console.log(
     "CSV Updated Successfully"
   );
-
-  // ---------------------------
-  // Regenerate JSON
-  // ---------------------------
 
   const csvLines =
     updatedCsv.trim().split("\n");
