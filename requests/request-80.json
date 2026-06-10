@@ -1,0 +1,11 @@
+{
+  "client": "CITI_BANK",
+  "application": "DATA-WAREHOUSE",
+  "currentEnvironment": "UAT",
+  "targetEnvironment": "PROD",
+  "rollbackEnvironment": "",
+  "version": "2.3.5",
+  "rollbackVersion": "",
+  "requestType": "",
+  "reason": "Promotion request from dashboard"
+}
