@@ -1,0 +1,10 @@
+{
+  "client": "JP_MORGAN",
+  "project": "RECON_WEB",
+  "sourceEnvironment": "QA",
+  "targetEnvironment": "UAT",
+  "releaseId": "RLS-1001",
+  "version": "2.26.0602.539",
+  "requestType": "PROMOTION",
+  "reason": "New changes from the previous version"
+}
