@@ -33,29 +33,31 @@ function ensureLogFile() {
 }
 
 function logPromotion(
-  request,
-  status = "SUCCESS"
+request,
+status = "SUCCESS"
 ){
 
-  ensureLogFile();
+ensureLogFile();
 
-  const timestamp =
-    new Date().toISOString();
+const timestamp =
+new Date().toISOString();
 
-  const logEntry =
-    `[${timestamp}] ISSUE#${ISSUE_NUMBER} | ` +
-    `By: ${TRIGGERED_BY} | ` +
-    `PROMOTION | ` +
-    `App: ${request.application} | ` +
-    `From: ${request.currentEnvironment} | ` +
-    `To: ${request.targetEnvironment} | ` +
-    `Version: ${request.version} | ` +
-    `Status: ${status}\n`;
+const logEntry =
+`[${timestamp}] ISSUE#${ISSUE_NUMBER} | ` +
+`By: ${TRIGGERED_BY} | ` +
+`${request.requestType} | ` +
+`Client: ${request.client} | ` +
+`Project: ${request.project} | ` +
+`From: ${request.sourceEnvironment || "N/A"} | ` +
+`To: ${request.targetEnvironment || "N/A"} | ` +
+`Release: ${request.releaseId} | ` +
+`Version: ${request.version} | ` +
+`Status: ${status}\n`;
 
-  fs.appendFileSync(
-    LOG_FILE,
-    logEntry
-  );
+fs.appendFileSync(
+LOG_FILE,
+logEntry
+);
 
 }
 

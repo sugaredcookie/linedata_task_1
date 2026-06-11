@@ -3,153 +3,154 @@ const path = require("path");
 
 module.exports = function(request) {
 
-  const csvPath = path.join(
-    process.cwd(),
-    "config-repo",
-    "applications",
-    "applications.csv"
-  );
+const csvPath = path.join(
+process.cwd(),
+"config-repo",
+"applications",
+"applications.csv"
+);
 
-  const jsonPath = path.join(
-    process.cwd(),
-    "config-repo",
-    "applications",
-    "applications.json"
-  );
+const jsonPath = path.join(
+process.cwd(),
+"config-repo",
+"applications",
+"applications.json"
+);
 
-  const csv =
-    fs.readFileSync(
-      csvPath,
-      "utf8"
+const csv =
+fs.readFileSync(
+csvPath,
+"utf8"
+);
+
+const lines =
+csv.trim().split("\n");
+
+let found = false;
+
+const updatedRows =
+lines.map((line, index) => {
+
+
+  if(index === 0){
+    return line;
+  }
+
+  const cols =
+    line.split(",");
+
+  const client =
+    cols[0]?.trim();
+
+  const project =
+    cols[1]?.trim();
+
+  const environment =
+    cols[2]?.trim();
+
+  if(
+
+    client === request.client &&
+    project === request.project &&
+    environment === request.targetEnvironment
+
+  ){
+
+    found = true;
+
+    console.log(
+      `Rolling Back ${project} in ${environment}`
     );
 
-  const lines =
-    csv.trim().split("\n");
+    cols[3] =
+      request.releaseId;
 
-  let found = false;
+    cols[4] =
+      request.version;
 
-  const updatedRows =
-    lines.map((line, index) => {
+    cols[5] =
+      new Date()
+        .toISOString()
+        .split("T")[0];
 
-      if(index === 0){
-        return line;
-      }
+    cols[6] =
+      "DEPLOYED";
 
-      const cols =
-        line.split(",");
-
-      const client =
-        cols[0]?.trim();
-
-      const application =
-        cols[1]?.trim();
-
-      if(
-
-        client === request.client &&
-        application === request.application
-
-      ){
-
-        found = true;
-
-        const currentVersion =
-          cols[2];
-
-        const previousVersion =
-          cols[3];
-
-        const currentEnvironment =
-          cols[4];
-
-        const previousEnvironment =
-          cols[5];
-
-        cols[2] =
-          previousVersion;
-
-        cols[3] =
-          currentVersion;
-
-        cols[4] =
-          previousEnvironment;
-
-        cols[5] =
-          currentEnvironment;
-
-        cols[10] =
-          new Date()
-            .toISOString()
-            .split("T")[0];
-
-        return cols.join(",");
-
-      }
-
-      return line;
-
-    });
-
-  if(!found){
-
-    throw new Error(
-      `Application ${request.application} not found`
-    );
+    return cols.join(",");
 
   }
 
-  const updatedCsv =
-    updatedRows.join("\n");
+  return line;
 
-  fs.writeFileSync(
-    csvPath,
-    updatedCsv
-  );
+});
 
-  const csvLines =
-    updatedCsv.trim().split("\n");
 
-  const headers =
-    csvLines[0]
-      .split(",")
-      .map(h => h.trim());
+if(
+!found
+){
 
-  const jsonData =
-    csvLines
-      .slice(1)
-      .map(line => {
 
-        const values =
-          line
-            .split(",")
-            .map(v => v.trim());
+throw new Error(
+  `Project ${request.project} not found`
+);
 
-        const obj = {};
 
-        headers.forEach(
-          (header, index) => {
+}
 
-            obj[header] =
-              values[index];
+const updatedCsv =
+updatedRows.join("\n");
 
-          }
-        );
+fs.writeFileSync(
+csvPath,
+updatedCsv
+);
 
-        return obj;
+const csvLines =
+updatedCsv.trim().split("\n");
 
-      });
+const headers =
+csvLines[0]
+.split(",")
+.map(h => h.trim());
 
-  fs.writeFileSync(
-    jsonPath,
-    JSON.stringify(
-      jsonData,
-      null,
-      2
-    )
-  );
+const jsonData =
+csvLines
+.slice(1)
+.map(line => {
 
-  console.log(
-    "Rollback Completed"
-  );
+
+    const values =
+      line
+        .split(",")
+        .map(v => v.trim());
+
+    const obj = {};
+
+    headers.forEach(
+      (header, index) => {
+
+        obj[header] =
+          values[index];
+
+      }
+    );
+
+    return obj;
+
+  });
+
+
+fs.writeFileSync(
+jsonPath,
+JSON.stringify(
+jsonData,
+null,
+2
+)
+);
+
+console.log(
+"Rollback Completed"
+);
 
 };

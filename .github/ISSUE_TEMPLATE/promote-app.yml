@@ -1,27 +1,48 @@
-name: Application Promotion
-description: Promote application to next environment
-title: "[PROMOTION] "
+name: Promotion Request
+
+description: Promote a release to another environment
+
+title: "[PROMOTION]"
 
 body:
 
   - type: input
-    id: application
+    id: client
     attributes:
-      label: Application Name
+      label: Client
+      placeholder: JP_MORGAN
     validations:
       required: true
 
   - type: input
-    id: current
+    id: project
     attributes:
-      label: Current Environment
+      label: Project
+      placeholder: RECON_WEB
     validations:
       required: true
 
   - type: input
-    id: target
+    id: sourceEnvironment
+    attributes:
+      label: Source Environment
+      placeholder: QA
+    validations:
+      required: true
+
+  - type: input
+    id: targetEnvironment
     attributes:
       label: Target Environment
+      placeholder: UAT
+    validations:
+      required: true
+
+  - type: input
+    id: releaseId
+    attributes:
+      label: Release ID
+      placeholder: RLS-1001
     validations:
       required: true
 
@@ -29,6 +50,16 @@ body:
     id: version
     attributes:
       label: Version
+      placeholder: 2.26.0602.539
+    validations:
+      required: true
+
+  - type: dropdown
+    id: requestType
+    attributes:
+      label: Request Type
+      options:
+        - PROMOTION
     validations:
       required: true
 

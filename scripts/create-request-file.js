@@ -37,23 +37,20 @@ const request = {
   client:
     extract("Client"),
 
-  application:
-    extract("Application Name"),
+  project:
+    extract("Project"),
 
-  currentEnvironment:
-    extract("Current Environment"),
+  sourceEnvironment:
+    extract("Source Environment"),
 
   targetEnvironment:
     extract("Target Environment"),
 
-  rollbackEnvironment:
-    extract("Rollback Environment"),
+  releaseId:
+    extract("Release ID"),
 
   version:
     extract("Version"),
-
-  rollbackVersion:
-    extract("Rollback Version"),
 
   requestType:
     extract("Request Type"),

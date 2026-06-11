@@ -11,14 +11,94 @@ console.log(
 console.log(request);
 
 if(
-  !request.application
+  !request.client
 ){
 
   console.error(
-    "Application Missing"
+    "Client Missing"
   );
 
   process.exit(1);
+
+}
+
+if(
+  !request.project
+){
+
+  console.error(
+    "Project Missing"
+  );
+
+  process.exit(1);
+
+}
+
+if(
+  !request.releaseId
+){
+
+  console.error(
+    "Release ID Missing"
+  );
+
+  process.exit(1);
+
+}
+
+if(
+  !request.version
+){
+
+  console.error(
+    "Version Missing"
+  );
+
+  process.exit(1);
+
+}
+
+if(
+  request.requestType ===
+  "PROMOTION"
+){
+
+  if(
+    !request.sourceEnvironment
+  ){
+
+    console.error(
+      "Source Environment Missing"
+    );
+
+    process.exit(1);
+
+  }
+
+  if(
+    !request.targetEnvironment
+  ){
+
+    console.error(
+      "Target Environment Missing"
+    );
+
+    process.exit(1);
+
+  }
+
+  if(
+    request.sourceEnvironment ===
+    request.targetEnvironment
+  ){
+
+    console.error(
+      "Source and Target Environment Cannot Match"
+    );
+
+    process.exit(1);
+
+  }
 
 }
 
@@ -28,38 +108,19 @@ if(
 ){
 
   if(
-    !request.rollbackEnvironment
+    !request.targetEnvironment
   ){
 
     console.error(
-      "Rollback Environment Missing"
+      "Target Environment Missing"
     );
 
     process.exit(1);
 
   }
 
-  console.log(
-    "Rollback Validation Passed"
-  );
-
-  process.exit(0);
-
-}
-
-if(
-  request.currentEnvironment ===
-  request.targetEnvironment
-){
-
-  console.error(
-    "Source and Target Environment Cannot Match"
-  );
-
-  process.exit(1);
-
 }
 
 console.log(
-  "Promotion Validation Passed"
+  "DEV Validation Passed"
 );

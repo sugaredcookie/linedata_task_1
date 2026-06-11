@@ -31,23 +31,20 @@ module.exports = function(body) {
     client:
       extract(body, "Client"),
 
-    application:
-      extract(body, "Application Name"),
+    project:
+      extract(body, "Project"),
 
-    currentEnvironment:
-      extract(body, "Current Environment"),
+    sourceEnvironment:
+      extract(body, "Source Environment"),
 
     targetEnvironment:
       extract(body, "Target Environment"),
 
-    rollbackEnvironment:
-      extract(body, "Rollback Environment"),
+    releaseId:
+      extract(body, "Release ID"),
 
     version:
       extract(body, "Version"),
-
-    rollbackVersion:
-      extract(body, "Rollback Version"),
 
     requestType:
       extract(body, "Request Type"),

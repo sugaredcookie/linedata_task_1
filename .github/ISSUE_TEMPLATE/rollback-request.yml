@@ -1,6 +1,9 @@
 name: Rollback Request
-description: Request an environment or version rollback
+
+description: Rollback deployment to an older release
+
 title: "[ROLLBACK]"
+
 labels:
   - rollback
 
@@ -15,26 +18,26 @@ body:
       required: true
 
   - type: input
-    id: application
+    id: project
     attributes:
-      label: Application Name
-      placeholder: TRADING
+      label: Project
+      placeholder: RECON_WEB
     validations:
       required: true
 
   - type: input
-    id: currentEnvironment
+    id: targetEnvironment
     attributes:
-      label: Current Environment
-      placeholder: UAT
+      label: Target Environment
+      placeholder: PROD
     validations:
       required: true
 
   - type: input
-    id: rollbackEnvironment
+    id: releaseId
     attributes:
-      label: Rollback Environment
-      placeholder: QA
+      label: Release ID
+      placeholder: RLS-999
     validations:
       required: true
 
@@ -42,15 +45,7 @@ body:
     id: version
     attributes:
       label: Version
-      placeholder: 1.8.4
-    validations:
-      required: true
-
-  - type: input
-    id: rollbackVersion
-    attributes:
-      label: Rollback Version
-      placeholder: 1.8.3
+      placeholder: 2.26.0424.485
     validations:
       required: true
 
