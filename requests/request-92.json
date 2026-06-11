@@ -1,0 +1,10 @@
+{
+  "client": "JP_MORGAN",
+  "project": "DASHBOARD_API",
+  "sourceEnvironment": "QA",
+  "targetEnvironment": "UAT",
+  "releaseId": "RLS-1200",
+  "version": "3.1.9",
+  "requestType": "PROMOTION",
+  "reason": "promotion from qa to uat"
+}
