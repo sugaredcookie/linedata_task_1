@@ -1,0 +1,10 @@
+{
+  "client": "JP_MORGAN",
+  "project": "RECON_DB",
+  "sourceEnvironment": "UAT",
+  "targetEnvironment": "PROD",
+  "releaseId": "RLS-1001",
+  "version": "2.26.0602.539",
+  "requestType": "PROMOTION",
+  "reason": "Promotion requested from dashboard"
+}
