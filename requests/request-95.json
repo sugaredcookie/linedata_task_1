@@ -1,0 +1,10 @@
+{
+  "client": "JP_MORGAN",
+  "project": "RECON_DB",
+  "sourceEnvironment": "",
+  "targetEnvironment": "PROD",
+  "releaseId": "RLS-1000",
+  "version": "2.26.0522.522",
+  "requestType": "ROLLBACK",
+  "reason": "Rollback requested from dashboard"
+}
