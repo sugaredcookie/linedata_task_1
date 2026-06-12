@@ -1,0 +1,10 @@
+{
+  "client": "Project: ALPHA_WEB",
+  "project": "Source Environment: UAT",
+  "sourceEnvironment": "Target Environment: PROD",
+  "targetEnvironment": "Release ID: RLS-1000",
+  "releaseId": "Version: 2.26.0602.539",
+  "version": "Request Type: PROMOTION",
+  "requestType": "Change Reason:",
+  "reason": ""
+}
