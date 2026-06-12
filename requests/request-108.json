@@ -1,0 +1,10 @@
+{
+  "client": "CLIENT_X",
+  "project": "ALPHA_WEB",
+  "sourceEnvironment": "UAT",
+  "targetEnvironment": "PROD",
+  "releaseId": "RLS-1000",
+  "version": "2.26.0602.539",
+  "requestType": "PROMOTION",
+  "reason": "Requested from Dashboard"
+}
